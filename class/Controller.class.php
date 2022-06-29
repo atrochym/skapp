@@ -70,7 +70,7 @@ class Controller {
 
 	public function loadModule()
 	{
-		$modulePath = ctype_alpha($this->module) ? "module/$this->module.php" : 'home';
+		$modulePath = ctype_alpha($this->module) ? "module/$this->module.php" : 'module/dashboard.php';
 	
 		if (!file_exists($modulePath))
 		{

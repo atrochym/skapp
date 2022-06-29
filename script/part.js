@@ -170,7 +170,7 @@ function sendCategory(e) {
 		"category": category
 	}
 
-	fetch('/sk/part/testSaveCategory/json', {
+	fetch('/sk/part/create-category/json', {
 		method: "post",
 		headers: {
 			"Content-Type": "application/json"

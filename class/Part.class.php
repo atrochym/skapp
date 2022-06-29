@@ -10,6 +10,46 @@ class Part
 	{}
 
 
+	public function createOrder(array $data)
+	{
+		$this->db->beginTransaction();
+
+		$lastGroupId = $this->db->run('SELECT group_id FROM parts ORDER BY id DESC LIMIT 1', [])->fetchColumn();
+		$lastGroupId++;
+		
+		foreach ($data['item'] as $item)
+		{			
+			do 
+			{
+				$part = [
+					'category_id' => $item['category'],
+					'group_id' => $lastGroupId,
+					'name' => $item['name'],
+					'price' => $item['price'],
+				];
+
+				$pardId = $this->db->insert('parts', $part);
+
+				$partDetails = [
+					'id' => $pardId,
+					'seller' => $data['seller'],
+					'url' => $item['url'],
+					'is_used' => $item['is_used'],
+					'note' => $item['note'],
+					'bought' => $data['orderDate'] . ' 02:02:02',
+					'creator_id' => getFromSession('workerId'),
+				];
+				$orderId = $this->db->insert('parts_details', $partDetails);
+				$item['amount']--;
+			}
+			while ($item['amount'] > 0);
+		}
+
+		$this->db->commit();
+		$this->message = 'success::Zamówienie zostało zapisane.';
+		return $orderId;
+	}
+
 	public function createCategory(string $name)
 	{
 		$values = [
