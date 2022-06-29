@@ -1,0 +1,9 @@
+config.php
+jsconfig.json
+test.php
+_*
+
+**/.DAV
+/.VSCodeCounter
+/scss
+/log

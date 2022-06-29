@@ -1,0 +1,29 @@
+<?php
+	$checkbox = formBackup('non_polish') ? 'checked' : '';
+?>
+<form action="/sk/customer/create" method="post">
+	<div class="content-box">
+		<h2 class="title">Rejestracja klienta</h2>
+		<label class="field-first label-small">Numery telefonu
+		<i class="tooltip fa fa-question-circle" title="• Numery możesz rozdzielać przecinkiem. &#013;• Spacje w tym polu są ignorowane. &#013;• Zagraniczny numer: +xy xxxyyyzzz"></i>
+			<input class="input" type="text" name="phone" value="<?= formBackup('phone') ?>">
+		</label>
+		<label class="field label-small">Imię i Nazwisko / Nazwa firmy
+			<input class="input" type="text" name="name" value="<?= formBackup('name') ?>">
+		</label>
+		<label class="field label-small">Email
+			<input class="input" type="text" name="email" value="<?= formBackup('email') ?>">
+		</label>
+		<label class="field-last label-small">
+			Obcojęzyczny
+			<i class="tooltip fa fa-question-circle" title="Zaznacz automatycznie, jeśli skóra klienta jest inna niż biała."></i>
+			<label class="customer-language">
+				<input type="checkbox" name="non_polish" value="1" <?= $checkbox ?>>
+				<span class="checkbox"></span>
+			</label>
+		</label>
+	</div>
+	<div class="buttons-box">
+		<button class="button-blue save" type="submit">Dodaj klienta</button>
+	</div>
+</form>

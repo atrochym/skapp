@@ -1,0 +1,133 @@
+<div class="content-box">
+	<h2 class="title">Klient</h2>
+	<button class="button" type="submit">Edytuj</button>
+	<div>
+		<span class="field-first label-gray-small">Numery telefonu</span>
+		<span class="field label-gray-small">Imię i Nazwisko / Nazwa firmy</span>
+		<span class="field label-gray-small">Email</span>
+		<span class="field-last label-gray-small">Obcojęzyczny</span>
+	</div>
+	<div style="padding: 10px 0 0 5px;">
+		<span class="field-first label"><?= $phone ?: '-' ?></span>
+		<span class="field label"><?= $name ?: '-' ?></span>
+		<span class="field label"><?= $email ?: '-' ?></span>
+		<span class="field-last label"><?= $non_polish ? 'Tak' : '-' ?></span>
+	</div>
+</div>
+<div class="content-box">
+	<h2 class="title">Urządzenie</h2>
+	<button class="button" type="submit">Edytuj</button>
+	<div>
+		<span class="field-first label-gray-small">Nazwa urządzenia</span>
+		<span class="field label-gray-small">Model</span>
+		<span class="field label-gray-small">Numer seryjny</span>
+
+	</div>
+	<div style="padding: 10px 0 0 5px;">
+		<span class="field-first label"><?= $producer ?></span>
+		<span class="field label"><?= $model ?: '-' ?></span>
+		<span class="field label"><?= $serial_number ?: '-' ?></span>
+	</div>
+</div>
+<form action="/sk/receive/create" method="post">
+	<input type="hidden" name="customer_id" value="<?= $customer_id ?>">
+	<input type="hidden" name="device_id" value="<?= $device_id ?>">
+
+	<div style="display:flex">
+		<div class="content-box issue-box">
+			<h2 class="title">Zgłoszanie usterki</h2>
+			<div class="column-1">
+				<label class="label-small horizontal">Hasło logowania
+					<input class="input password" type="text" name="password">
+				</label>
+				<span class="label-small">Usterka</span>
+				<textarea class="input-box input-box-issue" name="issue"></textarea>
+				
+
+			</div>
+			<div class="column-2">
+			<label class="label-small horizontal">Termin
+					<input class="input prediction prediction-date" type="date" name="predicted_datetime">
+					<input class="input prediction prediction-time" type="time" name="predicted_datetime">
+				</label>
+				<span class="label-small">Uwagi</span>
+				<textarea class="input-box input-box-notice" name="notice"></textarea>
+			</div>
+		</div>
+		<div class="content-box options-box">
+			<label class="field label-small">
+				<label class="checkbox-custom">
+					<input type="checkbox" name="cb-extra_items" value="1">
+					<span class="checkbox"></span>
+				</label>
+				Dodatkowe wyposażenie
+				<i class="tooltip fa fa-question-circle" title="Opisz dodatkowe wyposażenie w oknie 'uwagi'."></i>
+			</label>
+			<label class="field label-small">
+				<label class="checkbox-custom">
+					<input type="checkbox" name="cb-express" value="1">
+					<span class="checkbox"></span>
+				</label>
+				Usługa expres
+			</label>
+			<label class="field label-small">
+				<label class="checkbox-custom">
+					<input type="checkbox" name="cb-confirmation_receipt" value="1">
+					<span class="checkbox"></span>
+				</label>
+				Potwierdzenie odbioru
+			</label>
+			<label class="field label-small">
+				<label class="checkbox-custom">
+					<input type="checkbox" name="cb-draft" value="1">
+					<span class="checkbox"></span>
+				</label>
+				Zapisz jako wycenę
+			</label>
+		</div>
+	</div>
+	<div class="content-box valuation-box">
+		<h2 class="title">Zaproponowane rozwiązania</h2>
+		<div class="solution-area">
+			<h2 class="label label-small" style="width: 322px;">Rodzaj
+				<i class="tooltip fa fa-question-circle" title="• Dla oferty z GROUPON'u wpisz: &#013;groupon kod_grouponu&#013;Kwota nie jest wymagana."></i>
+			</h2>
+			
+			<h2 class="label label-small">Koszt</h2>
+			<div class="solution-box" data-id="0">
+				<input class="input solution" type="text" name="solution[0][name]">
+				<input class="input price" type="text" name="solution[0][price]">
+				<input class="input solution" type="text" name="solution[1][name]">
+				<input class="input price" type="text" name="solution[1][price]">
+				<input class="input solution" type="text" name="solution[2][name]">
+				<input class="input price" type="text" name="solution[2][price]">
+				<i class="remove fa fa-times"></i>
+			</div>
+
+			<div class="empty">
+				<i class="add fa fa-plus"></i>
+			</div>		
+		</div>
+		
+		<div class="price-area">
+			<h2 class="label label-small">RAZEM</h2>
+			<span class="price-total">-</span>		
+		</div>
+		<div class="advance-area">
+			<h2 class="label label-small advance-area">Wpłata zaliczki</h2>
+			<input class="input advance-input" type="text" name="advance_value" value="0.00">
+			<i class="erase fa fa-times"></i>
+		</div>
+	</div>
+
+	<div class="buttons-box">
+		<span style="padding-top: 5px;">Przydziel do:</span>
+		<select class="input select" name="worker_id" size="1" >
+			<option value="none">nie przydzielaj</option>
+			<option value="straszak-patryk">Patryk Straszak</option>
+			<option value="nowacki-kacper">Kacper Nowacki</option>
+		</select>
+		<button class="button-blue save" type="submit">Zapisz</button>
+		<button class="button-gray cancel" type="button" onclick="location.href='/sk/receive/customer/<?= $customer_id ?>'">Anuluj</button>
+	</div>
+</form>

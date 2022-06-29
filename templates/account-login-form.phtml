@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Studio-Komp - logowanie</title>
+	<link rel="stylesheet" href="<?= DIR ?>css/main.css">
+	<link rel="stylesheet" href="<?= DIR ?>css/font-awesome.min.css">
+
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div style="position: absolute; top: 30%; left: 50%; margin-right: -50%; transform: translate(-50%, 0%) ">
+	<div style="width:700px; background-color: #005279; padding: 8px 17px;">
+		<span style="font: 13px Arial; color: #fff;">Studio-Komp - logowanie</span>
+	</div>
+				<!-- <div style="position:absolute; width:700px; height:150px; padding-top:30px; background-color: #2E373F;"></div> -->
+	<div style="position:absolute;width:700px;  padding-top:30px; background-color: #2E373F; display:flex; justify-content: center; padding-bottom: 15px">
+		<form method="post" action="/sk/account/login">
+			<div style="margin-bottom: 15px; display:flex; justify-content: center; ">
+				<span class="x" style="display:inline-block; color:#F0F0F0;">Login:</span>
+				<input type="text" class="input-new" style="display:inline-block; width: 250px" name="worker_login" value="<?= formBackup('worker_login') ?>">
+			</div>
+			<div style="margin-bottom: 15px; display:flex; justify-content: center; ">
+
+				<span class="x" style="display:inline-block; color:#F0F0F0;">Hasło:</span>
+				<input type="text" class="input-new" style="display:inline-block; width: 250px" name="worker_password">
+			</div>
+			<div style="margin-top: 30px; display:flex; justify-content: space-between; width: 640px;">
+				<span class="label-gray-small" style="font-weight:800; padding-top: 10px"><?= $messageContent ?></span>
+				<button class="button button-blue" type="submit">Zaloguj</button>
+
+			</div>
+			<!-- <span class="account-form-text" style="position:absolute; left: 25px; bottom:5px; font-weight:800; text-align:left;width:auto;"><?= $messageX[0] ?></span> -->
+			<!-- <span class="label-gray-small" style="position:absolute; left: 25px; bottom:8px; font-weight:800; text-align:left;">Login lub hasło nieprawidłowe</span> -->
+			<!-- <span class="content-block-text" style="position:absolute; right: 157px; bottom:17px; font-weight:800; text-align:left; width:auto; cursor:pointer;" onclick="document.location='/sk/settings/'">Powrót</span> -->
+			<!-- <button class="button button-blue" type="submit" style="margin: 10px 0 20px 520px;">Zaloguj</button> -->
+			<!-- <button class="button button-blue" type="submit" style="margin: 10px 0 20px 520px; display:inline-block">Zaloguj</button> -->
+		</form>
+	</div>
+</div>
+</body>
+</html>

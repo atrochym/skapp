@@ -1,0 +1,145 @@
+<?php
+
+$allowChangeWorker = true;
+$allowEdit = true;
+$allowDelete = true;
+
+?>
+
+<div class="content-box">
+	<!-- <h2 class="title">Zaproponowane rozwiązania</h2> -->
+	<form class="form-test" action="/sk/service/create" method="post" style="width: inherit;">
+		<input type="hidden" name="receiveId" value="<?= $receiveId ?>">
+
+		<table class="services-list" data-id="0" data-count="0">
+			<tr>
+				<th class="col col1">Zaproponowane rozwiązanie</th>
+				<th class="col col2">Koszt</th>
+				<th class="col col3">Status</th>
+				<th class="col col4">Pracownik</th>
+				<th class="col col5">Akcje</th>
+			</tr>
+
+			<?php foreach ($services as $service): 
+				$priceTest = 'price';
+
+				switch ($service['status']) {
+					case 'opened':
+						$status = '-';
+						break;
+					case 'finished':
+						$status = 'Zrobione';
+						break;
+					case 'part_ordered':
+						$status = 'Część zamówiona';
+						break;
+					case 'canceled':
+						$status = 'Rezygnacja';
+						$priceTest = null;
+						break;
+					case 4:
+						$status = 'Usunięte';
+						$priceTest = null;
+						break;
+					case 5:
+						$status = 'Delegacja';
+						break;
+					default:
+						$status = 'Unknown';
+				}
+
+				if($service['deleted']) {
+					$status = 'Usunięte';
+					$priceTest = null;
+				}
+
+				if ($service['worker_id'] == 0) {
+					$workerName = '-';
+				} elseif ($service['worker_id'] == $workerId) {
+					$workerName = 'Ty';
+				} else {
+					// $workerName = workersList($service['worker_id']);
+					$workerName = $service['workerName'];
+
+				}
+
+				// to chyba tymczasowo
+				$workersList = $_SESSION['workersList'];
+				natcasesort($workersList);
+			?>
+			<tr class="row" data-service_id="<?= $service['id'] ?>">
+				<td class="kek"><input disabled class="input-test dupa" type="text" value="<?= $service['name'] ?>"></td>
+				<td class=""><input disabled class="input-test-cost <?= $priceTest ?>" type="text" value="<?= $service['price'] ?>"></td>
+				<td class=""><?= $status ?></td>
+				<td class="">
+					<div class="worker-name-test"><?= $workerName ?></div>
+					<select class="input select delegate" style="font-size: 12px; padding: 3px; width: 135px; display: none; margin: 0;" size="1" data-worker_id="<?= $service['worker_id'] ?>" >
+						<?php foreach($workersList as $key => $worker): ?>
+							<option value="<?= $key ?>"><?= $worker?></option>
+						<?php endforeach; ?>
+					</select>
+				</td>
+				<td class="">
+					<div class="action-buttons">
+					<?php
+
+						if ($actionButtons) {
+
+							if ($service['status'] == 'finished') {
+								print '<a class="ico fa fa-check" title="Cofnij oznaczenie ukończenia" href="/sk/service/' . $service['id'] . '/incomplete"></a>';
+
+							} elseif ($service['status'] == 'canceled') {
+								print '<a class="ico fa fa-frown-o" title="Cofnij rezygnację z naprawy" href="/sk/service/' . $service['id'] . '/restore"></a>';
+
+							} elseif ($service['deleted']) {
+								print '<a class="ico fa fa-trash" title="Przywróć" href="/sk/service/' . $service['id'] . '/recover"></a>';
+
+							} else {
+								print '<a class="ico fa fa-check" title="Oznacz jako ukończone" href="/sk/service/' . $service['id'] . '/complete"></a>';
+
+								if ($service['part_id']) {
+									print '<a class="ico fa fa-plug" title="Odłącz część" href="/sk/service/'.$service['id'].'/unplug-part/"></a>';
+								} else {
+									print '<a class="ico fa fa-wrench" title="Przypisz część" href="#" onclick="assignPart('.$service['id'].');"></a>';
+
+								}
+								
+
+								print '<a class="ico fa fa-frown-o" title="Rezygnacja z tej naprawy" href="/sk/service/' . $service['id'] . '/cancel"></a>';
+
+
+								if ($allowEdit) {
+									print '<a class="ico fa fa-edit row-edit" title="Edytuj"></a>';
+
+								}
+
+								if ($allowDelete) {
+									print '<a class="ico fa fa-trash" title="Usuń" href="/sk/service/' . $service['id'] . '/delete"></a>';
+								}
+
+								if ($allowChangeWorker) {
+									print '<i class="ico fa fa-user-plus change-worker-button" title="Zmień pracownika"></i>';
+								}
+
+							}
+						} else {
+							print '-';
+						}
+					?>
+					</div>
+					<div class="edit-buttons" style="display:none;">
+						<a class="ico fa fa-save row-edit-end" title="Aktualizuj" onclick="testsubmit(<?= $service['id'] ?>);"></a>
+						<a class="ico fa fa-times row-edit-end" title="Anuluj"></a>
+					</div>
+				</td>
+			</tr>
+			<?php endforeach; ?>
+			<!-- </tr> -->
+			<tr class="buttons" style="line-height: 28px;">
+				<td class="kek" style="text-align: right; padding-right: 10px;">RAZEM</td>
+				<td class="price-total" style="padding-left: 8px;">340 PLN</td>
+			</tr>
+			<button class="button add-solution" style="position: absolute; left:27px; bottom: 27px; top:auto; width:80px;" type="button">Dodaj</button>
+		</table>
+	</form>
+</div>

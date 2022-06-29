@@ -1,0 +1,18 @@
+<form action="/sk/device/create" method="post">
+<input type="hidden" name="customer_id" value="<?= $customerId ?>">
+	<div class="content-box">
+		<h2 class="title">Nowe urządzenie</h2>
+			<label class="field-first label-small">Marka urządzenia
+				<input class="input" type="text" name="producer" value="<?= formBackup('producer') ?>">
+			</label>
+			<label class="field label-small">Model
+				<input class="input" type="text" name="model" value="<?= formBackup('model') ?>">
+			</label>
+			<label class="field label-small">Numer seryjny
+				<input class="input" type="text" name="serial_number" value="<?= formBackup('serial_number') ?>">
+			</label>
+	</div>
+	<div class="buttons-box">
+		<button class="button-blue save" type="submit">Dodaj urządzenie</button>
+	</div>
+</form>

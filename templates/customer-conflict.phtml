@@ -1,0 +1,48 @@
+<form action="/sk/customer/save" method="post">
+	<input type="hidden" name="customer_id" value="<?= $customer_id ?>">
+	<div class="content-box">
+		<h2 class="title">Klient - edycja</h2>
+		<label class="field-first label-small">Numery telefonu
+		<i class="tooltip fa fa-question-circle" title="• Numery możesz rozdzielać przecinkiem. &#013;• Spacje w tym polu są ignorowane. &#013;• Zagraniczny numer: +xy xxxyyyzzz"></i>
+
+			<input class="input" type="text" name="telephone" value="<?= $telephone ?>">
+		</label>
+		<label class="field label-small">Imię i Nazwisko / Nazwa firmy
+			<input class="input" type="text" name="name" value="<?= $name ?>">
+		</label>
+		<label class="field label-small">Email
+			<input class="input" type="text" name="email" value="<?= $email ?>">
+		</label>
+		<?php 
+			$checked = $non_polish ? 'checked' : '';
+		?>
+		<label class="field-last label-small">
+			Obcojęzyczny
+			<i class="tooltip fa fa-question-circle" title="Zaznacz automatycznie, jeśli skóra klienta jest inna niż biała."></i>
+			<label class="customer-language">
+				<input type="checkbox" name="non_polish" value="1" <?= $checked ?>>
+				<span class="checkbox"></span>
+			</label>
+		</label>
+	</div>
+	<div class="content-box">
+		<h2 class="title">Klient - znaleziony duplikat</h2>
+		<div>
+			<span class="field-first label-gray-small">Numery telefonu</span>
+			<span class="field label-gray-small">Imię i Nazwisko / Nazwa firmy</span>
+			<span class="field label-gray-small">Email</span>
+			<span class="field-last label-gray-small">Obcojęzyczny</span>
+		</div>
+		<div style="padding: 10px 0 0 5px;">
+			<span class="field-first label"><?= $telephone_2 ?></span>
+			<span class="field label"><?= $name_2 ?></span>
+			<span class="field label"><?= $email_2 ?></span>
+			<span class="field-last label"><?= $non_polish_2 ? 'Tak' : '-'; ?></span>
+		</div>
+	</div>
+	<div class="buttons-box">
+		<a class="button-gray save" href="/sk/receive/customer/<?= $customer_id ?>">Anuluj</a>
+		<a class="button-blue save" href="/sk/customer/edit/<?= $customer_id_2 ?>">Edytuj duplikat</a>
+		<button class="button-blue save" type="submit">Zapisz</button>
+	</div>
+</form>

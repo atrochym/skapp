@@ -1,0 +1,115 @@
+<div class="content-box">
+	<h2 class="title">Klient</h2>
+	<a class="button" href="/sk/customer/edit/<?= $customerId ?>">Edytuj</a>
+	<div>
+		<span class="field-first label-gray-small">Numery telefonu</span>
+		<span class="field label-gray-small">Imię i Nazwisko / Nazwa firmy</span>
+		<span class="field label-gray-small">Email</span>
+		<span class="field-last label-gray-small">Obcojęzyczny</span>
+	</div>
+	<div style="padding: 10px 0 0 5px;">
+		<span class="field-first label"><?= $phone  ?: '-' ?></span>
+		<span class="field label"><?= $name  ?: '-' ?></span>
+		<span class="field label"><?= $email ?: '-' ?></span>
+		<span class="field-last label"><?= $nonPolish ?></span>
+	</div>
+</div>
+<?php if (isset($receiveList)): ?>
+	<div class="content-box">
+		<h2 class="title">Historia napraw
+			<i class="tooltip fa fa-question-circle" title="Nowe przyjęcie lub reklamacja zostaną dopisane do wybranego urządzenia z listy."></i>
+		</h2>
+		<table class="services-list">
+			<tr>
+				<th class="first">Urządzenie</th>
+				<th class="">Plomba</th>
+				<th class="">Usterka</th>
+				<th class="">Status</th>
+				<th class="">Akcje</th>
+			</tr>
+			<?php foreach ($devices as $device):
+
+					if (!$device['receive_id'])
+						continue;
+
+					$deviceLink = "location.href='/sk/receive/$device[receive_id]'";
+
+					if ($device['finished'])
+					{
+						$complaintLink = "location.href='/sk/receive/complaint/$device[device_id]'";
+						$complaint = '<i class="icon fa fa-wrench" title="Reklamacja" onclick="'.$complaintLink.'"></i>';
+						// $finished = longDate($device['finished_datetime']);
+						$finished = 'ukończony';
+					}
+					else
+					{
+						$complaint = '';
+						$finished = 'w takcie';
+					}
+			?>
+				<tr class="row">
+					<td class="col col1" onclick="<?= $deviceLink ?>"><?= $device['producer'] . ' ' . $device['model'] ?></td>
+					<td class="col col2" onclick="<?= $deviceLink ?>"><?= $device['sticker'] ?: '-' ?></td>
+					<td class="col col3" onclick="<?= $deviceLink ?>"><?= $device['issue'] ?: '-' ?></td>
+					<td class="col col4" onclick="<?= $deviceLink ?>"><?= $finished ?></td>
+					<td class="col col5">
+						<?= $complaint ?>
+						<i class="icon fa fa-edit" title="Edytuj" onclick="location.href='/sk/receive/<?= $device['receive_id'] ?>/edit/customer-'"></i>
+						<i class="icon fa fa-trash" title="Usuń" onclick="location.href='/sk/receive/<?= $device['receive_id'] ?>/delete'"></i>
+					</td>
+				</tr>
+			<?php endforeach; ?>
+		</table>
+	</div>
+<?php endif; ?>
+<?php if ($devices) : ?>
+	<div class="content-box">
+		<h2 class="title">Urządzenia
+			<i class="tooltip fa fa-question-circle" title="Nowe przyjęcie lub reklamacja zostanią dopisane do wybranego urządzenia z listy."></i>
+		</h2>
+		<table class="devices-list">
+			<tr>
+				<th class="first">Urządzenie</th>
+				<th class="">Numer seryjny</th>
+				<th class="">Notatka</th>
+				<th class="">Utworzony</th>
+				<th class="">Akcje</th>
+			</tr>		
+			<?php
+				$devices = filterDevicesDuplicates($devices);
+				// $devices = array_filter($devices, 'duplicates');
+				foreach ($devices as $device):
+
+					$deviceLink = "location.href='/sk/device/$device[device_id]'";
+			?>
+				<tr class="row">
+					<td class="col col1" onclick="<?= $deviceLink ?>"><?= $device['producer'] . ' ' . $device['model'] ?></td>
+					<td class="col col2" onclick="<?= $deviceLink ?>"><?= $device['serial_number'] ?: '-' ?></td>
+					<td class="col col3" onclick="<?= $deviceLink ?>"><?= $device['notice'] ?: '-' ?></td>
+					<td class="col col4" onclick="<?= $deviceLink ?>"><?= longDate($device['created']) ?></td>
+					<td class="col col5">
+						<i class="icon fa fa-edit" title="Edytuj" onclick="location.href='/sk/device/<?= $device['device_id'] ?>/edit'"></i>
+						<i class="icon fa fa-trash" title="Usuń" onclick="location.href='/sk/device/<?= $device['receive_id'] ?>/delete'"></i>
+				</tr>
+			<?php endforeach; ?>
+		</table>
+	</div>
+<?php endif; ?>
+<form action="/sk/device/create" method="post">
+	<input type="hidden" name="customer_id" value="<?= $customerId ?>">
+	<div class="content-box">
+		<h2 class="title">Nowe urządzenie</h2>
+			<label class="field-first label-small">Marka urządzenia
+				<input class="input" type="text" name="producer" value="<?= formBackup('producer') ?>">
+			</label>
+			<label class="field label-small">Model
+				<input class="input" type="text" name="model" value="<?= formBackup('model') ?>">
+			</label>
+			<label class="field label-small">Numer seryjny
+				<input class="input" type="text" name="serial_number" value="<?= formBackup('serial_number') ?>">
+			</label>
+	</div>
+	<div class="buttons-box">
+		<button class="button-blue save" type="submit">Dodaj</button>
+	</div>
+</form>

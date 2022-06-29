@@ -1,0 +1,25 @@
+﻿.user-entry {
+	#display:inline-block;
+	color: #fff;
+}
+
+.user-row:hover {
+	background-color: #404952 ;
+}
+
+
+
+
+a.small-button {
+	font: 11px Tahoma, sans-serif;
+	padding: 4px 25px 5px 25px;
+	display: inline-block; 
+	border-radius: 4px; 
+	background-color: #005279;
+	color: #fff; 
+	border: 1px solid #237196;
+}
+
+a.small-button:hover {
+	background-color: #004667; 
+}

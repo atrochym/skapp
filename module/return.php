@@ -1,0 +1,6 @@
+<?php
+
+$receiveId = $controller->id();
+
+
+?>

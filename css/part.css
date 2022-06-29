@@ -1,0 +1,148 @@
+.part-input {
+  display: inline-block;
+  margin-right: 10px;
+  font-size: 12px;
+}
+
+.part-input::-webkit-input-placeholder {
+  color: #b3b1b1;
+}
+
+.part-input:-ms-input-placeholder {
+  color: #b3b1b1;
+}
+
+.part-input::-ms-input-placeholder {
+  color: #b3b1b1;
+}
+
+.part-input::placeholder {
+  color: #b3b1b1;
+}
+
+.item {
+  position: relative;
+  border: solid white 0px;
+  padding: 20px 25px;
+}
+
+.item:hover {
+  background-color: #344049;
+}
+
+.item-icons {
+  position: absolute;
+  right: 25px;
+  top: 20px;
+}
+
+.item-icons .icon {
+  width: 22px;
+  height: 22px;
+  text-align: center;
+  border: 0px white solid;
+  color: #40474e;
+}
+
+.item-icons .icon:hover {
+  color: #308B9E;
+}
+
+.item-icons .icon-copy {
+  margin-right: 6px;
+  font-size: 20px;
+}
+
+.item-icons .icon-remove {
+  line-height: 20px;
+  font-size: 23px;
+}
+
+.select-category {
+  display: inline-block;
+  width: 185px;
+  padding: 3px;
+  font-size: 12px;
+  margin-right: 10px;
+}
+
+.amount-adjust {
+  width: 16px;
+  height: 16px;
+  text-align: center;
+  vertical-align: middle;
+  color: #40474e;
+  font-size: 15px;
+}
+
+.amount-adjust:hover {
+  color: #308B9E;
+}
+
+.checkbox-custom, .customer-language {
+  cursor: pointer;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  margin-right: 10px;
+  vertical-align: middle;
+  display: inline-block;
+  /* Create a custom checkbox */
+  /* Create the checkmark/indicator (hidden when not checked) */
+  /* On mouse-over, add a grey background color */
+  /* Show the checkmark when checked */
+  /* Style the checkmark/indicator */
+}
+
+.checkbox-custom input, .customer-language input {
+  display: none;
+}
+
+.checkbox-custom .checkbox, .customer-language .checkbox {
+  display: block;
+  width: 25px;
+  height: 24px;
+  background-color: #41505C;
+  border-radius: 4px;
+  border: solid 1px #546776;
+  padding: 3px 8px;
+}
+
+.checkbox-custom .checkbox:after, .customer-language .checkbox:after {
+  content: "";
+  display: none;
+}
+
+.checkbox-custom:hover input ~ .checkbox, .customer-language:hover input ~ .checkbox {
+  border-color: #66AFE9;
+  -webkit-box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.075), 0px 0px 8px rgba(102, 175, 233, 0.7);
+          box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.075), 0px 0px 8px rgba(102, 175, 233, 0.7);
+}
+
+.checkbox-custom input:checked ~ .checkbox:after, .customer-language input:checked ~ .checkbox:after {
+  display: block;
+}
+
+.checkbox-custom .checkbox:after, .customer-language .checkbox:after {
+  width: 8px;
+  height: 14px;
+  border: solid;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(35deg);
+          transform: rotate(35deg);
+}
+
+.customer-language {
+  display: block;
+  margin: 14px 0 0 5px;
+}
+
+.input-date {
+  padding: 2px 3px 3px 3px;
+}
+
+.display-block {
+  display: block;
+}
+/*# sourceMappingURL=part.css.map */

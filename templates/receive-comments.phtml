@@ -1,0 +1,45 @@
+			<div class="content-box comment-box">
+				<h2 class="title">Notatki (<?= $commentsCount ?>)</h2>
+				<i class="ico-test fa fa-caret-up"></i>
+				<div class="animate">
+				<form action="/sk/device/<?= $receiveId ?>/add-comment" method="POST">
+
+				<div class="comment">
+					<!-- <input type="hidden" name="receive" value="<?= $receiveId ?>"> -->
+					<div class="c-worker">
+						<span class="avatar-user">AT</span>
+						<span class="worker-name">Andrzej Trochym</span>
+						<!-- Andrzej Trochym -->
+					</div>
+						<textarea name="comment" class="c-content input-box"></textarea>
+
+					<div class="button-box">
+						<!-- <select class="input select" name="action" size="1" >
+							<option>Dołącz akcję</option>
+							<option value="mark-done">Oznacz jako zakończone</option>
+							<option value="mark-cancel">Rezygnacja</option>
+						</select> -->
+						<button class="button-blue">Wyślij</button>
+					</div>
+				</div>
+				</form>
+
+				<?php foreach($comments as $comment): ?>
+					
+				<div class="comment">
+					<div class="c-worker">
+						<span class="avatar-user"><?= $comment['worker_short'] ?></span>
+						<span class="worker-name"><?= $comment['worker_name'] ?></span>
+					</div>
+					<div class="c-content"><?= $comment['content'] ?></div>
+					<div class="c-date"><?= $comment['create_datetime'] ?></div>
+					<div class="ico-box">
+						<i class="ico fa fa-edit"></i>
+						<a class="ico fa fa-trash" title="Usuń" href="/sk/device/<?= $receiveId ?>/remove-comment/comment-<?= $comment['id'] ?>"></a>
+					</div>
+				</div>
+
+				<?php endforeach; ?>
+
+				</div>
+			</div>

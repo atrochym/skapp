@@ -1,0 +1,28 @@
+<div class="content-box">
+	<h2 class="title">Urządzenia
+		<i class="tooltip fa fa-question-circle" title="Nowe przyjęcie lub reklamacja zostanią dopisane do wybranego urządzenia z listy."></i>
+	</h2>
+	<table class="devices-list">
+		<tr>
+			<th class="first">Urządzenie</th>
+			<th class="">Numer seryjny</th>
+			<th class="">Notatka</th>
+			<th class="">Utworzony</th>
+			<th class="">Akcje</th>
+		</tr>		
+		<?php foreach ($devices as $device): 
+				extract($device);
+				$deviceLink = "location.href='/sk/device/$id'";
+		?>
+			<tr class="row">
+				<td class="col col1" onclick="<?= $deviceLink ?>"><?= $producer . ' ' . $model ?></td>
+				<td class="col col2" onclick="<?= $deviceLink ?>"><?= $serial_number ?: '-' ?></td>
+				<td class="col col3" onclick="<?= $deviceLink ?>"><?= $notice ?: '-' ?></td>
+				<td class="col col4" onclick="<?= $deviceLink ?>"><?= longDate($created) ?></td>
+				<td class="col col5">
+					<i class="icon fa fa-edit" title="Edytuj" onclick="location.href='/sk/device/<?= $id ?>/edit'"></i>
+					<i class="icon fa fa-trash" title="Usuń" onclick="location.href='/sk/device/<?= $id ?>/delete'"></i>
+			</tr>
+		<?php endforeach; ?>
+	</table>
+</div>

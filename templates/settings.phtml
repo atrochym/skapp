@@ -1,0 +1,81 @@
+<div id="worker-add-background" style="left:0px; top:0px;display:none; position: fixed; width: 100%; height: 100%; background: #131313; z-index:10; opacity: 0.8; z-index:10;"></div>
+
+<div id="worker-add-window" style="display:none; position: fixed; top: 30%; left: 50%; margin-right: -50%; transform: translate(-50%, 0%); z-index:11; ">
+	<div style="width:700px; background-color: #005279; padding: 8px 17px;">
+		<span style="font: 13px Arial; color: #fff;">Nowy pracownik</span>
+	</div>
+
+	<div style="position:absolute;width:700px; background-color: #2E373F; padding: 20px 16px; height:130px;">
+		<form autocomplete="off" method="post" action="/sk/account/create">
+			<!-- <input type="hidden" name="from" value="settings/"> -->
+			<div style="display:inline-block; width:268px; padding:0 10px; margin-right:14px;">
+				<span class="content-block-text">Imię i Nazwisko</span>
+				<input type="text" class="form-input input-form " style="width:100%;" name="name" value="<?= formBackup('name') ?>">
+			</div>
+
+			<div style="display:inline-block; width:356px; padding:0 10px;margin-right:14px;">
+				<span class="content-block-text">Email</span>
+				<input type="text" class="form-input input-form " style="width:100%;" name="email" value="<?= formBackup('email') ?>">
+			</div>
+
+			<div style="top: 10px;">
+				<button class="button button-blue" type="submit" style="margin-left: 10px; height:27px; width:auto; position:absolute; right:36px; bottom: 25px; padding: 0 30px;">Dodaj</button>
+				<button class="button button-gray" type="reset" style="margin-left: 10px; height:27px; width:auto; position:absolute; right:138px; bottom: 25px; padding: 0 30px;">Reset</button>
+			</div>
+			<span class="content-block-text" style="position:absolute; left: 27px; bottom:17px; font-weight:800; text-align:left;width:auto; cursor:pointer;" onclick="toggleAddWorker()">Powrót</span>
+		</form>
+	</div>
+
+</div>
+
+<span class="section-name">Ustawienia</span>
+
+		<div style="width:auto;height:auto;background-color: #2E373F;border-radius: 5px;margin-top: 25px;padding:12px 25px;">
+			<span class="content-block-header" style="display:inline;">Użytkownicy</span>
+			<?php if (workerPermit('temp_add_worker')): ?>
+			<a class="small-button" style="position: absolute; right: 30px;" onclick="toggleAddWorker()">Dodaj</a>
+			<?php endif; ?>
+
+			<?php if ($workers): ?>
+				<div style="margin: 25px 0 15px 0; font: 14px Tahoma; display:flex; ">
+					<span class="" style="width: 200px; ">Nazwa</span>
+					<span class="" style="width: 180px; ">Login</span>
+					<span class="" style="width: 250px; ">Email</span>
+					<span class="" style="width: 100px; ">Status</span>
+				</div>
+				<?php foreach($workers as $worker): 
+					extract($worker);	?>
+					
+					<div class="worker-row" style="font: 14px Tahoma; display:flex; padding: 8px 11px; border-radius: 3px;">
+						<span class="worker-entry" style="width: 200px; "><?= $name ?></span>
+						<span class="worker-entry" style="width: 180px; "><?= $login ?></span>
+						<span class="worker-entry" style="width: 250px; "><?= $email ?></span>
+						<span class="worker-entry" style="width: 135px; "><?= $status ?></span>
+						<span class="worker-entry" style="width: 62px;" onclick="document.location='/sk/account/<?= $id ?>/edit'">Edytuj</span>
+						<span class="worker-entry" style="width: 75px;" onclick="document.location='/sk/account/<?= $id ?>/<?= $manageUrl ?>'"><?= $manage ?></span>
+						<span class="worker-entry" style="width: 90px; cursor:pointer;" onclick="document.location='/sk/account/<?= $id ?>/reset-password'">Resetuj hasło</span>
+					</div>
+				<?php endforeach; ?>
+			<?php else: ?>
+				<br><br> Brak użytkowników do wyświetlenia.
+			<?php endif; ?>
+		</div>
+
+
+		<div style="width:auto;height:auto;background-color: #2E373F;border-radius: 5px;margin-top: 25px;padding:12px 25px;">
+			<span class="content-block-header" style="display:inline;">Uprawnienia</span>
+			<form method="post" action="/sk/account/permission">
+				<button class="button button-blue" type="submit" style="position: absolute; right: 30px;" name="">Zapisz</button>
+				<div style="display:flex; flex-wrap:wrap;margin-top:20px;">
+				<?php foreach($permissions as $key => $value):
+						$checkbox = (bool)$value ? 'checked' : '';
+				?>
+
+							<div style="height: 30px; display:flex;"> 
+							<input type="checkbox" name="permission['<?= $key ?>']" value="1" style="margin-right:20px;" <?= $checkbox ?>>
+								<span style="width:200px;"><?= $key ?></span>
+							</div>
+				<?php endforeach; ?>
+				</div>
+			</form>
+		</div>

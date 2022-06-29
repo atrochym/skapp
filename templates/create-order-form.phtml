@@ -1,0 +1,44 @@
+<div class="content-box">
+	<h2 class="title">Nowy zakup internetowy</h2>
+	<form class="form-create-order" action="/sk/part/save-order" method="post" style="width: inherit;" data-id="0" data-count="0">
+		<div class="single-fields" style="padding-left: 25px; margin-bottom: 15px;">
+			<input class="input part-input input-date" style="width: 145px; font-family: inherit;" type="date" name="order-date" data-type="order-date" placeholder="Data zakupu">
+			<input class="input part-input" style="width: 230px;" type="text" data-type="seller" name="seller" placeholder="Sprzedawca">
+			<input class="input part-input" style="width: 100px;" type="text" name="delivery-cost" data-type="delivery-cost" placeholder="Koszt dostawy">
+		</div>
+		<div class="item">
+			<div style="margin-bottom: 10px;">
+				<select class="input select-category" type="text" name="item[0][category]" data-type="category">
+					<option value="0" disabled selected>Kategoria</option>
+						<?php if (is_array($partCategories)):
+								foreach ($partCategories as $category): 
+									extract($category); ?>
+					<option value="<?= $id ?>"><?= $name ?></option>
+						<?php endforeach; endif; ?>
+					<option class="add-category-option" value="add">[+] Utwórz nową</option>
+				</select>
+				<input class="input part-input part-url" style="width: 288px;" type="text" name="item[0][url]" data-type="url" placeholder="Link do oferty">
+				<input class="input part-input part-note" style="width: 292px;" type="text" name="item[0][note]" data-type="note" placeholder="Uwagi">
+				<label class="field label-small" style="vertical-align: top;">
+					<label class="checkbox-custom">
+						<input type="checkbox" name="item[0][cb-is_used]" data-type="is-used" value="1">
+						<span class="checkbox"></span>
+					</label>
+					Stan - używany
+				</label>
+			</div>
+			<div>
+				<input class="input part-input part-name" style="width: 487px;" type="text" name="item[0][name]" data-type="name" placeholder="Nazwa">
+				<input class="input part-input part-price" style="width: 76px;" type="text" name="item[0][price]" data-type="price" placeholder="Cena szt.">
+				<a class="fa fa-minus amount-adjust amount-substract" href="javascript:;"></a>
+				<input class="input part-input part-amount" style="width: 32px; margin: 0;" type="text" name="item[0][amount]" data-type="amount" value="1">
+				<a class="fa fa-plus amount-adjust amount-add" href="javascript:;"></a>
+			</div>
+			<div class="item-icons">
+				<i class="fa fa-times icon icon-remove" onclick="removeItem(this)"></i>
+			</div>
+		</div>
+		<button class="save" type="submit">wyślij</button>
+	</form>	
+	<i class="fa fa-plus icon-add add-item"></i>
+</div>

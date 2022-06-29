@@ -1,0 +1,22 @@
+			<div class="content-box">
+				<h2 class="title">Zamontowane części</h2>
+				<i class="ico-test fa fa-caret-up"></i>
+				<div class="animate">
+					<table class="history-list">
+						<?php foreach ($parts as $part): ?>
+							<tr class="row">
+								<td class="col col1">1</td>
+								<td class="col col2"><?= $part['name'] ?></td>
+								<td class="col col3"><?= longDate($part['assigned']) ?></td>
+							</tr>
+						<?php endforeach; ?>
+						<tr class="row">
+							<td>
+								<button class="button" style="left:27px; bottom: 10px; top:auto">Dodaj ze stanu</button>
+								<button class="button" style="left:155px; bottom: 10px; top:auto">Nowy zakup</button>
+							</td>
+						</tr>
+					</table>
+
+				</div>
+			</div>

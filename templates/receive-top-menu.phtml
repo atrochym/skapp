@@ -1,0 +1,50 @@
+<?php
+	
+	$showPassword = !$password ? 'hidden' : '';
+	
+?>
+
+<div class="section-name">
+	<span class="device">
+		<!-- 214/09 Marka urządzenia, model :: Czeka na decyzję -->
+		[<?= $tag ?>], <?= $name ?>
+	</span>
+	<span class="term">Termin: <?= $predicted_datetime ?></span>
+</div>
+<div class="top-menu">
+	<?php 
+		if ($finished) : ?>
+		Zamknięte <a href="/sk/receive/<?= $receiveId ?>/open">(Otwórz)</a>
+		<?php elseif ($deleted): ?>
+		Usunięte <a href="/sk/receive/<?= $receiveId ?>/recover">(Przywróć)</a>
+		<?php elseif ($returned): ?>
+		Wydane
+		<?php else: ?>
+
+		<div>
+			<?php
+				if ($delegateReceive) {
+					print '<a class="button-m" href="/sk/device/'. $receiveId .'/delegate">
+							<i class="ico fa fa-check"></i>Oddeleguj</a>';
+				} else {
+					print '<a class="button-m" href="/sk/receive/'. $receiveId .'/complete">
+					<i class="ico fa fa-check"></i>Zgłoś jako ukończony</a>';
+				}
+			?>
+			<a class="button-m" href="#">
+				<i class="ico fa fa-comment-o"></i>Kontakt z klientem</a>
+			<a class="button-m" href="#">
+				<i class="ico fa fa-frown-o"></i>Rezygnacja</a>
+			<a class="button-m" href="#">
+				<i class="ico fa fa-edit"></i>Edytuj</a>
+			<a class="button-m" href="/sk/receive/<?= $receiveId ?>/delete">
+				<i class="ico fa fa-trash"></i>Usuń</a>
+		</div>
+		<?php endif; ?>
+	<div>
+		<span class="right-field">
+			<i class="right-ico fa fa-lock <?= $showPassword ?>"></i><?= $password ?></span>
+		<span class="right-field">
+			<i class="right-ico fa fa-phone"></i><?= $phone ?></span>
+	</div>
+</div>

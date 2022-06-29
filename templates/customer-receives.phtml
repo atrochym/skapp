@@ -1,0 +1,39 @@
+<div class="content-box">
+	<h2 class="title">Historia napraw
+		<i class="tooltip fa fa-question-circle" title="Nowe przyjęcie lub reklamacja zostanią dopisane do wybranego urządzenia z listy."></i>
+	</h2>
+	<table class="services-list">
+		<tr>
+			<th class="first">Urządzenie</th>
+			<th class="">Plomba</th>
+			<th class="">Usterka</th>
+			<th class="">Ukończony</th>
+			<th class="">Akcje</th>
+		</tr>
+		<?php foreach ($receives as $receive) : 
+				extract($receive);
+
+				$deviceLink = "location.href='/sk/receive/$receive_id'";
+				if (@$finished_datetime) {
+					$complaintLink = "location.href='/sk/receive/complaint/$id'";
+					$complaint = '<i class="icon fa fa-wrench" title="Reklamacja" onclick="'.$complaintLink.'"></i>';
+					// $finished = longDate($device['finished_datetime']);
+				} else {
+					$complaint = '';
+					$finished = 'w takcie';
+				}
+		?>
+			<tr class="row">
+				<td class="col col1" onclick="<?= $deviceLink ?>"><?= $producer . ' ' . $model ?></td>
+				<td class="col col2" onclick="<?= $deviceLink ?>"><?= $sticker ?: '-' ?></td>
+				<td class="col col3" onclick="<?= $deviceLink ?>"><?= $issue ?: '-' ?></td>
+				<td class="col col4" onclick="<?= $deviceLink ?>"><?= $finished ?></td>
+				<td class="col col5">
+					<?= $complaint ?>
+					<i class="icon fa fa-edit" title="Edytuj" onclick="location.href='/sk/receive/<?= $receive_id ?>/edit'"></i>
+					<i class="icon fa fa-trash" title="Usuń" onclick="location.href='/sk/receive/<?= $receive_id ?>/delete'"></i>
+				</td>
+			</tr>
+		<?php endforeach; ?>
+	</table>
+</div>

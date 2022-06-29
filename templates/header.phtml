@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pl">
+<html>
+	<head>
+		<title><?= $siteTitle ?></title>
+		<link rel="stylesheet" href="<?= DIR ?>css/font-awesome.min.css">
+		<link rel="stylesheet" href="<?= DIR ?>css/main.css">
+		<?php	foreach ($resourcesCSS as $resource): ?>
+		<link rel="stylesheet" href="<?= DIR ?>css/<?= $resource ?>.css">
+		<?php	endforeach; ?>
+
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@800&display=swap" rel="stylesheet">
+		<script>
+			<?= $jsScript = 0 ?>
+		</script>
+	</head>
+	<body>		
+		<div class="wrapper">
+			<div class="header">
+				<span id="logo">Studio-Komp.pl</span>
+				<div class="sidebar-icon-box" style="width: 405px; height: 44px; margin-right:140px">
+					<i class="fa fa-search"></i>
+					<input type="text" id="search" class="sidebar-search" placeholder="szukaj">
+				</div>
+				<span id="user"><?= $workerName; ?></span>
+
+				<a class="header-icon-box" href="#">
+					<i class="fa header-icon-box-fa fa-bell"></i>
+				</a>
+				<a class="header-icon-box" href="<?= DIR ?>account">
+					<i class="fa header-icon-box-fa fa-user"></i>
+				</a>
+				<a class="header-icon-box" href="<?= DIR ?>settings">
+					<i class="fa header-icon-box-fa fa-gear"></i>
+				</a>
+				<a class="header-icon-box" href="<?= DIR ?>account/logout">
+					<i class="fa header-icon-box-fa fa-bed"></i>
+				</a>
+			</div>

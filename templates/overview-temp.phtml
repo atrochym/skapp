@@ -1,0 +1,21 @@
+<div class="content-box">
+	<h2 class="title">Lista wszystkich przyjęć</h2>
+	<table class="receives-list">
+		<tr> 
+			<th class="first">Tag</td>
+			<th>Urządzenie - model</td>
+			<th>Usterka</td>
+			<th>Pracownik</td>
+			<th>Ukończony</td>
+		</tr>
+		<?php foreach ($receives as $receive):?>
+		<tr class="row" onclick="location.href='/sk/device/<?= $receive['receive_id'] ?>'"> 
+			<td class="col col1" ><?= $receive['tag'] ?></td>
+			<td class="col col2" ><?= $receive['producer'] ?> - <?= $receive['model'] ?></td>
+			<td class="col col3" ><?= $receive['issue'] ?></td>
+			<td class="col col4" ><?= $receive['worker_id'] ?></td>
+			<td class="col col5" ><?= $receive['finished'] ?></td>
+		</tr>
+		<?php endforeach; ?>
+	</table>
+</div>

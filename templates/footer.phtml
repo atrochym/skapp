@@ -1,0 +1,8 @@
+		</div>
+	</body>
+	<script src="<?= DIR ?>script/jquery-1.12.4.min.js "></script>
+	<script src="<?= DIR ?>script/main.js"></script>
+	<?php	foreach ($resourcesJS as $resource): ?>
+	<script src="<?= DIR ?>script/<?= $resource ?>.js"></script>
+	<?php	endforeach; ?>
+</html>

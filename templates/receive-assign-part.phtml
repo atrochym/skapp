@@ -1,0 +1,83 @@
+<div id="part-add-background" style="display:none; position: fixed; left:0; top:0; width: 100%; height: 100%; background: #141414eb;z-index:10;"></div>
+
+<div id="part-add-window" class="assign-part-box" style="display: none;">
+
+	<div style="width:100%; background-color: #005279; padding: 8px 17px;">
+		<span style="font: 12px Tahoma; color: #F5F5F5;">Dołącz część do usługi</span>
+	</div>
+	<form autocomplete="off" method="post" action="/sk/service/8/assign-part">
+		<input type="hidden" name="assign-mode" value="use-sticker">
+		<input class="service_id" type="hidden" name="service_id" value="">
+		<div class="option-box">
+			<span class="content-block-text" style="display:inline-block; padding-right: 0px;">Numer plomby z części</span>
+			<i class="tooltip fa fa-question-circle" style="display:inline; margin-right: 25px;" title="Dla urządzenia ze stanu magazynowego: &#013;• Nowe - spisz wyłącznie numer plomby z urządzenia &#013;• Używane - wpisz nazwę i numer naklejanej plomby"></i>
+			<input type="text" class="form-input input-form " style="width:125px; margin-bottom: 0px;" name="sticker" value="<?= formBackup('sticker') ?>">
+			<button class="button-gray" type="submit" style="position: absolute; right: 30px;">Dodaj</button>
+		</div>
+	</form>
+	<form autocomplete="off" method="post" action="/sk/service/8/assign-part">
+		<input type="hidden" name="assign-mode" value="create-part">
+		<input class="service_id" type="hidden" name="service_id" value="">
+		<div class="option-box">
+			<div style="display: inline-block; width: 268px; vertical-align: top; margin-right: 30px;padding-bottom: 50px;">
+				<span class="content-block-text" style="padding-right: 15px; display: inline-block;">Nadany numer części</span>
+				<input type="text"  class="form-input input-form " style="width:125px; display: inline-block;" name="sticker" value="<?= formBackup('sticker') ?>">
+				<span class="content-block-text" style="padding-right: 15px; display: inline-block;">Kategoria</span>
+				<select class="input select" style="width: 182px; display: inline-block; margin: 0; font-size: 12px;" name="category_id" size="1" >
+					<option>-</option>
+					<option value="2">Dyski twarde - używane</option>
+				</select>
+			</div>
+			<div style="display: inline-block; width: 480px; vertical-align: top; margin-right: 30px;">
+				<span class="content-block-text" style="display:inline-block; padding-right: 15px;">Nazwa</span>
+				<input type="text"  class="form-input input-form " style="width:415px; display: inline-block;" name="name" value="<?= formBackup('name') ?>">
+				<span class="content-block-text" style="display:inline-block; padding-right: 15px;">Notatka</span>
+				<input type="text" class="form-input input-form " style="width:409px; display: inline-block;" name="note" value="<?= formBackup('note') ?>">
+			</div>
+			<div style="display: inline-block; width: 185px; vertical-align: top;">
+				<span class="content-block-text" style="display:inline-block; padding-right: 15px;">Cena</span>
+				<input type="text" class="form-input input-form " style="width:115px;display: inline-block;" name="price" value="<?= formBackup('price') ?>">
+				<span class="content-block-text" style="display:inline-block; padding-right: 15px;">Używany</span>
+				<label class="checkbox-custom" style="display: inline-block;">
+					<input type="checkbox" name="cb-used" value="1">
+					<span class="checkbox"></span>
+				</label>
+			</div>
+			<button class="button-gray" type="submit" style="position: absolute; right: 30px; bottom: 20px;">Dodaj</button>
+		</div>
+	</form>
+	<form autocomplete="off" method="post" action="/sk/service/8/assign-part">
+		<input type="hidden" name="assign-mode" value="use-part_id">		
+		<input class="service_id" type="hidden" name="service_id" value="">
+		<div class="option-box" style="padding: 30px 0 70px 0; border: none;">
+
+			<span class="content-block-text" style="display:inline-block;margin-left: 30px;">Ostatnio zamówione:</span>
+
+			<table class="services-list" data-id="0" data-count="0">
+				<tr class="row">
+					<td class="col col1">
+						<input type="radio" style="display: inline-block;" name="part_id" value="2">
+					</td>
+					<td class="col col2">12345</td>
+					<td class="col col3">Dysk WD Green 120GB SATA 2,5</td>
+					<td class="col col4" style="width: 70px;">X-Kom</td>
+					<td class="col col4" style="width: 70px;">Nowy</td>
+					<td class="col col4" style="padding-right: 30px;">śr, 23.02.2022 12:13</td>
+				</tr>
+				<tr class="row">
+					<td class="col col1">
+						<input type="radio" style="display: inline-block;" name="part_id" value="3">
+					</td>
+					<td class="col col2">12345</td>
+					<td class="col col3">Dysk WD Green 120GB SATA 2,5</td>
+					<td class="col col4" style="width: 70px;">X-Kom</td>
+					<td class="col col4" style="width: 70px;">Nowy</td>
+					<td class="col col4" style="padding-right: 30px;">śr, 23.02.2022 12:13</td>
+				</tr>
+			</table>
+			<span class="content-block-text" style="position: absolute; right: 177px; bottom: 18px; cursor: pointer;" onclick="togglePartAdd()">Powrót</span>
+			<button class="button-gray" type="submit" style="position: absolute; right: 30px; bottom: 20px; cursor: pointer;">Wybierz</button>
+
+		</div>
+	</form>
+</div>

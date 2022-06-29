@@ -1,0 +1,26 @@
+<div class="content-box">
+	<h2 class="title">Klienci
+		<i class="tooltip fa fa-question-circle" title="Nowe przyjęcie lub reklamacja zostanią dopisane do wybranego urządzenia z listy."></i>
+	</h2>
+	<table class="devices-list">
+		<tr>
+			<th class="first">Numer telefonu</th>
+			<th class="">Imię i Nazwisko / Nazwa firmy</th>
+			<th class="">Email</th>
+			<th class="">Akcje</th>
+		</tr>		
+		<?php foreach ($customers as $customer) : 
+				extract($customer);
+				$deviceLink = "location.href='/sk/customer/$id'";
+		?>
+			<tr class="row">
+				<td class="col col1" onclick="<?= $deviceLink ?>"><?= $phone ?></td>
+				<td class="col col2" onclick="<?= $deviceLink ?>"><?= $name ?: '-' ?></td>
+				<td class="col col3" onclick="<?= $deviceLink ?>"><?= $email ?: '-' ?></td>
+				<td class="col col5">
+					<i class="icon fa fa-edit" title="Edytuj" onclick="location.href='/sk/customer/<?= $id ?>/edit'"></i>
+					<i class="icon fa fa-trash" title="Usuń" onclick="location.href='/sk/customer/<?= $id ?>/delete'"></i>
+			</tr>
+		<?php endforeach; ?>
+	</table>
+</div>
