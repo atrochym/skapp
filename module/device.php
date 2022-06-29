@@ -86,6 +86,7 @@ if (!$deviceData)
 
 $view->joinCSS('device');
 $view->joinCSS('receive');
+$view->joinJS('device');
 $view->addView('receive-create');
 $view->addData($deviceData);
 $view->render();

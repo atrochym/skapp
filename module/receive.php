@@ -21,7 +21,7 @@ if ($action == 'create' && $_SERVER['REQUEST_METHOD'] == 'POST')
 
 	$validData = $validate->getValidData();
 
-	foreach ($_POST['solution'] as $key => $value)
+	foreach ($_POST['solution'] as $key => $value) // jest też w service.php
 	{
 		$validate->add('name', $value['name'], 'require text 3 100');
 		$validate->add('price', $value['price'], 'require interval 1 9');
@@ -36,18 +36,12 @@ if ($action == 'create' && $_SERVER['REQUEST_METHOD'] == 'POST')
 		$validData['solution'][$key]['price'] = $validate->price;
 	}
 
-	$result = $receive->create($validate->getValidData());
+	$receive = new Receive($db);
+	$receive->create($validData);
 
-	if (!$result)
-	{
-		setMessage('error::Wystąpił błąd podczas zapisywania danych.');
-		$controller->redirect('back');
-	}
+	setMessage($receive->message);
 
 	$controller->redirect('back');
-
-	// $view->render();
-
 }
 
 $view->joinCSS('receive');
@@ -64,30 +58,7 @@ if (!$receiveData)
 }
 
 
-if ($action == 'customer') { // usunąć
-	$customerId = $controller->id();
-
-	$customerModel = new CustomerModel($model);
-	$customerView = new CustomerView($view);
-
-	$devices = $customerModel->devices($customerId);
-	$customerView->devices($devices);
-
-	$customerView->render();
-
-} elseif ($action == 'device_') {
-	$deviceId = $controller->id();
-
-	$deviceModel = new DeviceModel($model);
-	$deviceView = new DeviceView($view);
-
-	$device = $deviceModel->device($deviceId);
-	$deviceView->device($device);
-
-	$view->render();
-
-}
-elseif ($action == 'device')
+if ($action == 'device')
 {
 	$deviceId = $controller->id();
 
@@ -266,7 +237,7 @@ exit;
 	$receiveId = $controller->id();
 
 	if (!$receiveId) {
-		redirect('receive/new');
+		$controller->redirect('receive/new');
 	}
 
 	$result = $receiveModel->setReceive($receiveId);
@@ -397,7 +368,7 @@ $receive->execute();
 
 if(!$receive->rowCount()) {
 	$message->set($receiveId .' - takie przyjęcie nie istnieje..', 'yellow');
-	redirect('receive/new');
+	$controller->redirect('receive/new');
 }
 
 $data = $receive->fetch();

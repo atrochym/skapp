@@ -1,13 +1,20 @@
 <?php
 
 $partId = $controller->id();
-$partModel = new PartModel($model, $partId);
+// $partModel = new PartModel($model, $partId);
 
 if ($action == 'create-order')
 {
-	$partView = new PartView($view);
-	$partView->createOrder($partModel->partCategories());
-	$view->render();	
+	$part = new Part($db);
+	$partCategories = $part->getAllCategories();
+
+	$view->joinCSS('part');
+	$view->joinJS('part');
+	$view->addData(['partCategories' => $partCategories]);
+	$view->addView('create-order-form');
+	$view->addView('category-create');
+	$view->render();
+
 }
 elseif ($action == 'save-order')
 {
@@ -30,12 +37,31 @@ elseif ($action == 'create-category-DEPRACTED')
 	$model->message->set($result);
 	$controller->redirect('back');
 }
-elseif ($action == 'testSaveCategory' && $_SERVER['REQUEST_METHOD'] == 'POST')
+elseif ($action == 'testSaveCategory')
 {
 	$input = json_decode(file_get_contents('php://input'), true);
-	$result = $partModel->saveCategory($input);
 
-	echo json_encode($result);
+	$validate = new Validate;
+	$validate->add('name', $input['category'], 'require text 3 50');
+
+	if (!$validate->getValid())
+	{
+		$response['categoryId'] = null;
+		$response['message'] = 'warn::Nazwa kategorii ma niepoprawny format lub długość.';
+		
+		echo json_encode($response);
+		exit;
+	}
+
+	$part = new Part($db);
+	$result = $part->createCategory($validate->name);
+
+	$response['categoryId'] = $result;
+	$response['categoryName'] = $validate->name;
+	$response['message'] = $part->message;
+
+	echo json_encode($response);
+	exit;
 }
 
 ?>

@@ -77,6 +77,7 @@ class Validate {
 			$this->_validData[$fieldName] = &$this->{$fieldName};
 		}
 
+		$this->_fieldFail = null;
 		return true;
 	}
 

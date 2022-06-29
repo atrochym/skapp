@@ -1,53 +1,14 @@
 <?php
 
 require 'config.php';
-
-if (!str_contains($_SERVER['REQUEST_URI'], 'json')) {
-
-	error_reporting(E_ALL);
-	ini_set('display_errors', 1);
-}
-
-function debugMode() {
-	// dla v() ve() e() i PDO
-	$debugMode = DEBUG;
-
-	if (str_contains($_SERVER['REQUEST_URI'], 'json'))
-		return false;
-
-	return $debugMode;
-}
-
-session_start();
-
-
-// // ===  do wywalenia bo jest w kontrolerze, ale jeszcze używana
-// function redirect($destination) {
-// 	header('Location: ' . DIR . $destination);
-// 	exit;
-// }
-
-function classLoader($className) {
-	// $className = strtolower($className);
-	$classFile = "class/$className.class.php";
-
-	if (!file_exists($classFile)) {
-		throw new Exception('classLoader: missing class '.$className);
-	}
-	require_once($classFile);
-	return;
-}
-
-spl_autoload_register('classLoader');
-
 require 'functions.php';
 
-
+spl_autoload_register('classLoader');
+session_start();
 
 $controller = new Controller;
 $db = new Database;
-$model = new Model($db);
-$view = new View($model->getData());
+$view = new View;
 
 
 $module = $controller->loadModule();
@@ -56,14 +17,56 @@ $id = $controller->id();
 
 if (!$_SESSION['workerId'] && $module !== 'module/account.php')
 {
-	$model->message->set([
-		'messageContent' => 'Wymaganie zalogowanie się.',
-		'messageType' => '']
-	);
+	setMessage('warn::Wymaganie zalogowanie się.');
 	
-	$_SESSION['locationUrl']['afterLogin'] = $_SESSION['locationUrl']['this'];
+	$_SESSION['locationUrl']['afterLogin'] = $_SESSION['locationUrl']['this']; // zapakować w funkcję czy coś
 
 	$controller->redirect('account/login-form/redir');
 }
 
+if(workerLoggedIn())
+{
+	$workerId = getFromSession('workerId');
+	$values = ['workerId' => $workerId];
+	$worker = $db->run('SELECT security_token FROM workers WHERE id = :workerId LIMIT 1', $values)->fetch();
+
+	if ($worker['security_token'] != getFromSession('workerSecurityToken'))
+	{
+		$account = $db->run('SELECT is_disabled FROM workers WHERE id = :workerId LIMIT 1', $values)->fetch();
+
+		if ($account['is_disabled'])
+		{
+			session_destroy();
+			session_start();
+
+			// nie mam lepszego pomysłu
+			setMessage('error::Twoje konto zostało dezaktywowane przez administratora.');
+			$controller->redirect('account/login-form');
+		}
+
+		$permissions = $db->run('SELECT * FROM permissions WHERE worker_id = :workerId', $values)->fetch(); // zduplikowane w class worker po logowaniu
+
+		array_shift($permissions);
+		foreach ($permissions as $permission => $value)
+		{
+			$_SESSION['permission'][$permission] = $value;
+		}
+
+		$token = substr(md5(rand() . 'token'), 0, 10); // jest zduplikowana do metody w class worker
+		$values = [
+			'token' => $token,
+			'workerId' => $workerId,
+		];
+		$updateToken = $db->run('UPDATE workers SET security_token = :token WHERE id = :workerId', $values);
+
+		if (!$updateToken) {
+			session_destroy();
+			session_start();
+			throw new Exception('ERR: update token failed.'); // dla testu
+		}
+
+		$_SESSION['workerSecurityToken'] = $token;
+	}
+}
+v('s');
 require($module);

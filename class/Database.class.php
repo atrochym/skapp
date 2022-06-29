@@ -3,7 +3,6 @@
 class Database extends PDO
 {
 	public $pdo;
-	public $test = 'xD';
 
 	public function __construct()
 	{
@@ -61,9 +60,17 @@ class Database extends PDO
 				exit('PDO Exception, check in debug mode.');
 			}
 
-			echo $e->getMessage() . '<br>';
-			echo $e->getTrace()[1]['file'] . ' :: '. $e->getTrace()[1]['line'] . '<br>';
-			echo json_encode($data);
+			$line1 = $e->getMessage(); // duplikuję, ogarnąć
+			$line2 = $e->getTrace()[1]['file'] . ' :: '. $e->getTrace()[1]['line'];
+			$line3 = json_encode($data);
+
+			logToFile($line1);
+			logToFile($line2);
+			logToFile($line3);
+
+			echo $line1 . '<br>';
+			echo $line2 . '<br>';
+			echo $line3;
 			exit;
 		}
 	}
@@ -86,9 +93,17 @@ class Database extends PDO
 				exit('PDO Exception, check in debug mode.');
 			}
 
-			echo $e->getMessage() . '<br>';
-			echo $e->getTrace()[0]['file'] . ' :: '. $e->getTrace()[0]['line'] . '<br>';
-			echo json_encode($data);
+			$line1 = $e->getMessage();
+			$line2 = $e->getTrace()[1]['file'] . ' :: '. $e->getTrace()[1]['line'];
+			$line3 = json_encode($data);
+
+			logToFile($line1);
+			logToFile($line2);
+			logToFile($line3);
+
+			echo $line1 . '<br>';
+			echo $line2 . '<br>';
+			echo $line3;
 			exit;
 		}
 	}

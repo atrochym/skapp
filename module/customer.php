@@ -34,21 +34,6 @@ if ($action == 'create')
 	$controller->redirect('customer/' . $result);
 
 }
-elseif ($action == 'edit')
-{
-	$customerModel = new CustomerModel($model);
-	$result = $customerModel->edit($customerId);
-
-	if (!$result['success']) {
-		$model->message->set($result);
-		$controller->redirect('back');
-	}
-
-	$customerView = new CustomerView($view);
-	$customerView->editForm($result);
-	$customerView->render();	
-
-}
 elseif ($action == 'update') // zostaje
 {
 	$validate = new Validate;
@@ -73,7 +58,7 @@ elseif ($action == 'update') // zostaje
 	setMessage($customer->message);
 	$controller->redirect('customer/' . $validate->customerId);	
 
-} elseif ($action == 'edit-conflict') {
+} elseif ($action == 'edit-conflict') { // raczej wyleci
 	// na razie nie używane, info w modelu
 	$customerModel = new CustomerModel($model);
 	$customerView = new CustomerView($view);
@@ -124,20 +109,23 @@ elseif ($action == 'update') // zostaje
 
 	$view->render();
 	
-} elseif ($action == 'list') {
-	$customer = new CustomerModel($model);
-	$result = $customer->getAll();
+}
+elseif ($action == 'list')
+{
+	$customer = new Customer($db);
+	$result = $customer->getAllCustomers();
 
-	if (!$result['success']) {
-		$model->message->set($result);
-		$controller->redirect('customer/new');
+	if ($result)
+	{
+		$view->joinCSS('receive'); // ogarnąć, wyodrębnić
+		$view->joinCSS('device');
+		$view->addData(['customers' => $result]);
+		$view->addView('customer-list');
+		$view->render();
 	}
 
-	$customerView = new CustomerView($view);
-	$customerView->customerList($result);
-
-	$view->render();
-
+	setMessage($customer->message);
+	$controller->redirect('customer/register');
 
 }
 elseif ($action == 'register') //zostaje
@@ -151,6 +139,17 @@ elseif ($action == 'history') //zostaje
 	$view->addView('customer-create-form');
 	
 	$view->render();
+}
+elseif ($action == 'edit')
+{
+	$customer = new Customer($db);
+	$customer->setCustomerId($controller->id());
+	$customerData = $customer->getData();
+
+	$view->addData($customerData);
+	$view->addView('customer-edit');
+	$view->render();
+
 }
 elseif ($action == 'test')
 {
@@ -177,7 +176,7 @@ $customerData = $customer->getData();
 if ($customerData === false)
 {
 	setMessage($customer->message);
-	redirect('desktop');
+	$controller->redirect('desktop');
 }
 
 $devices = $customer->devices();

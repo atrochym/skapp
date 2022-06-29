@@ -178,7 +178,6 @@ function sendCategory(e) {
 		body: JSON.stringify(data)
 	})
 	.then(res => {
-
 		if(!res.ok) {
 			cl(Promise.reject(`fetch response error: ${res.status}`));
 		}
@@ -188,21 +187,21 @@ function sendCategory(e) {
 				insertCategory(res);
 			})
 			.catch ((e) => {
-				cl('fetch json parse error' + e);
+				cl('fetch json parse error :: ' + e);
 			})
 
 	})
 	.catch((e) => {
-		cl('fetch connection error: ' + e);
+		cl('fetch connection error :: ' + e);
 	})
 }
 
 
 function insertCategory(jsonResponse) {
 
-	showMessageBox(jsonResponse.messageContent, jsonResponse.messageType);
+	showMessageBox(jsonResponse.message);
 
-	if(jsonResponse.success) {
+	if(jsonResponse.categoryId) {
 		let categoryListDOM = document.querySelectorAll('.select-category');
 
 		categoryListDOM.forEach(element => {
@@ -220,12 +219,20 @@ function insertCategory(jsonResponse) {
 	toggleOverlayWindow();
 }
 
-function showMessageBox(message, type) {
+function showMessageBox(message) {
 
 	let messageDOM = document.querySelector('.message');
-	messageDOM.textContent = message;
-	messageDOM.className = `message message-${type}`;
-	messageDOM.style.display = 'block';
+	let separator = message.indexOf('::');
+
+	if (!separator)
+	{
+		console.log('showMessageBox :: wrong message format')
+	}
+	let messageType = message.slice(0, separator);
+	let messageContent = message.slice(separator + 2);
+
+	messageDOM.textContent = messageContent;
+	messageDOM.className = `message message-${messageType}`;
 }
 
 

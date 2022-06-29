@@ -12,27 +12,43 @@ class Service
 		$this->workerId = getFromSession('workerId');
 	}
 	
-	public function update(array $post)
+	public function update(array $data)
 	{
 		if (!$this->getData() || $this->isReceiveLocked() || $this->isServiceLocked())
 		{
 			return false;
 		}
 
-		$data = [
+		$values = [
 			'serviceId' => $this->serviceId,
-			'name' => $post['name'],
-			'price' => $post['price'],
+			'name' => $data['name'],
+			'price' => $data['price'],
 		];
-		$this->db->run('UPDATE services SET name = :name, price = :price WHERE id = :serviceId', $data);
+		$this->db->run('UPDATE services SET name = :name, price = :price WHERE id = :serviceId', $values);
 		$this->message = 'success::Zmiany zostały zapisane.';
 
 		return true;
 	}
 
-	public function create(array $post)
+	public function create(array $data)
 	{
-		
+		$this->db->beginTransaction();
+
+		foreach ($data['solution'] as $service)
+		{
+			$values = [
+				'receive_id' => $data['receiveId'],
+				'creator_id' => getFromSession('workerId'),
+				'name' => $service['name'],
+				'price' => $service['price']
+			];
+
+			$this->db->insert('services', $values);
+		}
+
+		$this->db->commit();
+		$this->message = 'info::Przyjęcie zostało zaktualizowane.';
+		return true;
 	}
 	
 	public function restore()
@@ -42,11 +58,11 @@ class Service
 			return false;
 		}
 
-		$data = [
+		$values = [
 			'serviceId' => $this->serviceId,
 			'workerId' => $this->workerId,
 		];
-		$this->db->run("UPDATE services SET status = 'opened', worker_id = :workerId WHERE id = :serviceId", $data);
+		$this->db->run("UPDATE services SET status = 'opened', worker_id = :workerId WHERE id = :serviceId", $values);
 		$this->message = 'success::Usługa '.  $this->service['name'] .' została przywrócona.';
 
 		return true;
@@ -59,11 +75,11 @@ class Service
 			return false;
 		}
 
-		$data = [
+		$values = [
 			'serviceId' => $this->serviceId,
 			'workerId' => $this->workerId,
 		];
-		$this->db->run("UPDATE services SET status = 'canceled', worker_id = :workerId WHERE id = :serviceId", $data);
+		$this->db->run("UPDATE services SET status = 'canceled', worker_id = :workerId WHERE id = :serviceId", $values);
 		$this->message = 'success::Usłudze '.  $this->service['name'] .' został cofnięty status ukończonej.';
 
 		return true;
@@ -76,11 +92,11 @@ class Service
 			return false;
 		}
 
-		$data = [
+		$values = [
 			'serviceId' => $this->serviceId,
 			'workerId' => $this->workerId,
 		];
-		$this->db->run("UPDATE services SET status = 'opened', worker_id = :workerId WHERE id = :serviceId", $data);
+		$this->db->run("UPDATE services SET status = 'opened', worker_id = :workerId WHERE id = :serviceId", $values);
 		$this->message = 'success::Usłudze '.  $this->service['name'] .' został cofnięty status ukończonej.';
 
 		return true;
@@ -99,11 +115,11 @@ class Service
 			return false;
 		}
 
-		$data = [
+		$values = [
 			'serviceId' => $this->serviceId,
 			'workerId' => $this->workerId,
 		];
-		$this->db->run("UPDATE services SET status = 'finished', finished = NOW(), worker_id = :workerId WHERE id = :serviceId", $data);
+		$this->db->run("UPDATE services SET status = 'finished', finished = NOW(), worker_id = :workerId WHERE id = :serviceId", $values);
 		$this->message = 'success::Usługa '.  $this->service['name'] .' została ukończona.';
 
 		return true;
@@ -116,11 +132,11 @@ class Service
 			return false;
 		}
 
-		$data = [
+		$values = [
 			'serviceId' => $this->serviceId,
 			'workerId' => $workerId,
 		];
-		$this->db->run('UPDATE services SET worker_id = :workerId WHERE id = :serviceId', $data);
+		$this->db->run('UPDATE services SET worker_id = :workerId WHERE id = :serviceId', $values);
 		$this->message = 'success::Przypisano dla: '. $workerId .'.';
 
 		return true;
@@ -133,11 +149,11 @@ class Service
 			return false;
 		}
 
-		$data = [
+		$values = [
 			'serviceId' => $this->serviceId,
 			'workerId' => $this->workerId,
 		];
-		$this->db->run('UPDATE services SET deleted = 0, worker_id = :workerId WHERE id = :serviceId', $data);
+		$this->db->run('UPDATE services SET deleted = 0, worker_id = :workerId WHERE id = :serviceId', $values);
 		$this->message = 'success::Usługa ' . $this->service['name'] . 'została przywrócona.';
 
 		return true;
@@ -150,11 +166,11 @@ class Service
 			return false;
 		}
 
-		$data = [
+		$values = [
 			'workerId' => $this->workerId,
 			'serviceId' => $this->serviceId,
 		];
-		$this->db->run('UPDATE services SET deleted = 1, worker_id = :workerId WHERE id = :serviceId', $data);
+		$this->db->run('UPDATE services SET deleted = 1, worker_id = :workerId WHERE id = :serviceId', $values);
 		$this->message = 'success::Usługa ' . $this->service['name'] . 'została usunieta.';
 
 		return true;
@@ -248,11 +264,11 @@ class Service
 			return $this->service;
 		}
 
-		$data = ['serviceId' => $this->serviceId];
+		$values = ['serviceId' => $this->serviceId];
 		$service = $this->db->run(
 			'SELECT s.*, r.status AS receive_status, r.deleted AS receive_deleted FROM services AS s
 			LEFT JOIN receives AS r ON s.receive_id = r.id
-			WHERE s.id = :serviceId', $data)->fetch();
+			WHERE s.id = :serviceId', $values)->fetch();
 
 		if (!$service)
 		{

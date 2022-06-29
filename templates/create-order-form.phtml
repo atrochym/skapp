@@ -10,11 +10,10 @@
 			<div style="margin-bottom: 10px;">
 				<select class="input select-category" type="text" name="item[0][category]" data-type="category">
 					<option value="0" disabled selected>Kategoria</option>
-						<?php if (is_array($partCategories)):
-								foreach ($partCategories as $category): 
-									extract($category); ?>
-					<option value="<?= $id ?>"><?= $name ?></option>
-						<?php endforeach; endif; ?>
+						<?php foreach ($partCategories as $category): 
+								extract($category); ?>
+						<option value="<?= $id ?>"><?= $name ?></option>
+						<?php endforeach; ?>
 					<option class="add-category-option" value="add">[+] Utwórz nową</option>
 				</select>
 				<input class="input part-input part-url" style="width: 288px;" type="text" name="item[0][url]" data-type="url" placeholder="Link do oferty">

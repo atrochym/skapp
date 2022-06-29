@@ -19,13 +19,13 @@ $receives = $receives->fetchAll();
 
 // v($receives);
 
-$data = array(
-	'testMessage' => $message->show(),
-	'receives' => $receives,
-);
+// $data = array(
+// 	'testMessage' => $message->show(),
+// 	'receives' => $receives,
+// );
 
-$view = new View('overview-temp', $data);
-$view->title('przegląd ');
+// $view = new View('overview-temp', $data);
+$view->addView('overview-temp');
 $view->joinCSS('overview');
 
 $view->render();

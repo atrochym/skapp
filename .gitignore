@@ -4,6 +4,7 @@ test.php
 _*
 
 **/.DAV
+/.vscode
 /.VSCodeCounter
 /scss
 /log

@@ -37,8 +37,8 @@ class Receive
 			return false;
 		}
 		
-		$data = ['receiveId' => $this->receiveId];
-		$this->db->run('UPDATE receives SET finished = NULL, status = NULL WHERE id = :receiveId', $data);
+		$values = ['receiveId' => $this->receiveId];
+		$this->db->run('UPDATE receives SET finished = NULL, status = NULL WHERE id = :receiveId', $values);
 
 		$this->message = 'success::Przyjęcie zostało otwarte.';
 		return true;
@@ -69,8 +69,8 @@ class Receive
 			return false;
 		}
 
-		$data = ['receiveId' => $this->receiveId];
-		$this->db->run("UPDATE receives SET finished = NOW(), status = 'finished' WHERE id = :receiveId", $data);
+		$values = ['receiveId' => $this->receiveId];
+		$this->db->run("UPDATE receives SET finished = NOW(), status = 'finished' WHERE id = :receiveId", $values);
 
 		$this->message = 'success::Przyjęcie ukończone, przekazane do wydania.';
 		return true;
@@ -97,12 +97,12 @@ class Receive
 
 		$worker = $_SESSION['workerId'];
 
-		$data = [
+		$values = [
 			'receiveId' => $this->receiveId,
 			'worker_id' => $worker
 		];
 
-		$this->db->run("UPDATE receives SET worker_id = :worker_id, started = NOW(), status = 'started' WHERE id = :receiveId", $data);
+		$this->db->run("UPDATE receives SET worker_id = :worker_id, started = NOW(), status = 'started' WHERE id = :receiveId", $values);
 
 		$this->message = 'info::Rozpocząłeś zadanie.';
 		return true;
@@ -121,8 +121,8 @@ class Receive
 			return false;
 		}
 
-		$data = ['receiveId' => $this->receiveId];
-		$this->db->run("UPDATE receives SET finished = NULL, status = 'started' WHERE id = :receiveId", $data);
+		$values = ['receiveId' => $this->receiveId];
+		$this->db->run("UPDATE receives SET finished = NULL, status = 'started' WHERE id = :receiveId", $values);
 
 		$this->message = 'success::Przyjęcie zostało otwarte.';
 		return true;
@@ -135,8 +135,8 @@ class Receive
 			return;
 		}
 
-		$data = ['receiveId' => $this->receiveId];
-		$this->db->run('UPDATE receives SET deleted = 0 WHERE id = :receiveId', $data);
+		$values = ['receiveId' => $this->receiveId];
+		$this->db->run('UPDATE receives SET deleted = 0 WHERE id = :receiveId', $values);
 
 		$this->message = 'success::Przyjęcie zostało przywrócone.';
 		return true;
@@ -149,8 +149,8 @@ class Receive
 			return;
 		}
 
-		$data = ['receiveId' => $this->receiveId];
-		$this->db->run('UPDATE receives SET deleted = 1 WHERE id = :receiveId', $data);
+		$values = ['receiveId' => $this->receiveId];
+		$this->db->run('UPDATE receives SET deleted = 1 WHERE id = :receiveId', $values);
 
 		$this->message = 'success::Przyjęcie zostało usunięte.';
 		return true;
@@ -178,7 +178,7 @@ class Receive
 
 		$this->db->beginTransaction();
 
-		$data = [
+		$values = [
 			'tag' => $tag,
 			'device_id' => $data['device_id'],
 			'creator_id' => getFromSession('workerId'),
@@ -194,21 +194,22 @@ class Receive
 			'predicted_datetime' => $data['predicted_datetime']
 		];
 
-		$receiveId = $this->db->insert('receives', $data);
+		$receiveId = $this->db->insert('receives', $values);
 
-		foreach ($data['solution'] as $service)
+		foreach ($data['solution'] as $service) // tak samo dodaję usługi w services.class.php
 		{
-			$data = [
+			$values = [
 				'receive_id' => $receiveId,
 				'creator_id' => 99,
 				'name' => $service['name'],
 				'price' => $service['price']
 			];
 
-			$this->db->insert('services', $data);
+			$this->db->insert('services', $values);
 		}
 
 		$this->db->commit();
+		$this->message = 'success::Przyjęcie zostało utworzone.';
 		return $receiveId;
 		// return true;
 
@@ -249,7 +250,7 @@ class Receive
 	// {
 	// 	if (empty($this->receive))
 	// 	{
-	// 		$data = ['id' => $this->receiveId];
+	// 		$values = ['id' => $this->receiveId];
 	// 		$exec = $this->db->run(
 	// 			'SELECT r.id AS receive_id, r.*, d.customer_id, d.producer, d.model, c.telephone
 	// 			FROM receives AS r 
@@ -283,13 +284,13 @@ class Receive
 			return $this->receive;
 		}
 
-		$data = ['receiveId' => $this->receiveId];
+		$values = ['receiveId' => $this->receiveId];
 		$receive = $this->db->run(
 			'SELECT r.id AS receive_id, r.*, d.customer_id, d.producer, d.model, c.phone
 			FROM receives AS r 
 			LEFT JOIN devices AS d ON r.device_id = d.id 
 			LEFT JOIN customers AS c ON d.customer_id = c.id 
-			WHERE r.id = :receiveId', $data)->fetch();
+			WHERE r.id = :receiveId', $values)->fetch();
 
 		if (!$receive)
 		{

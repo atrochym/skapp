@@ -1,5 +1,3 @@
 
 <div class="content">
-	<?php if (isset($messageContent)): ?>
-		<div class="message message-<?= $messageType ?>"><?= $messageContent ?></div>
-	<?php endif; ?>
+	<div class="message message-<?= isset($messageType) ? $messageType : 'hidden' ?> "><?= isset($messageContent) ? $messageContent : '' ?></div>

@@ -2,82 +2,69 @@
 
 class Worker
 {
-	private $login, $password;
-	private $message;
+	public $message;
 	private $worker;
 
-	public function __construct(
-
-		private object $db,
-		private Validate $validate
-		)
+	public function __construct(private Database $db)
 	{}
 
-	public function login()
+	public function login(array $data)
 	{
-		$this->validate->add('login', $this->login, 'login require');
-		$this->validate->add('password', $this->password, 'password require');
+		$values = ['login' => $data['login']];
+		$result = $this->db->run('SELECT * FROM workers WHERE login = :login', $values)->fetch();
 
-		if (!$this->validate->getValid())
-		{
-			$this->message = '{error}Nieprawidłowy format loginu lub hasła.';
-			return false;
-		}
-
-		$data = ['login' => $this->validate->login];
-		$result = $this->db->run("SELECT * FROM workers WHERE login = :login", $data);
-
-		if (!$result->rowCount())
+		if (!$result)
 		{
 			$this->message = '{error}Konto o podanym loginie nie istnieje.';
 			return false;
 		}
 
-		$this->worker = $result->fetch();
+		$this->worker = $result;
 
-		$password = $this->preparePassword($this->validate->password);
+		$password = $this->preparePassword($data['password']);
 
-		$data = ['password' => $password];
-		$password = $this->db->run("SELECT SHA2(:password, 256)", $data)->fetchColumn();
+		$values = ['password' => $password];
+		$password = $this->db->run("SELECT SHA2(:password, 256)", $values)->fetchColumn();
 
 		if ($this->worker['password'] !== $password)
 		{
-			$this->message = '{error}Podane hasło jest nieprawidłowe.';
+			$this->message = 'error::Podane hasło jest nieprawidłowe.';
 			return false;
 		}
 
 		if ($this->worker['is_disabled'])
 		{
-			$this->message = '{error}Konto zostało wyłączone przez administratora.';
+			$this->message = 'warn::Konto zostało wyłączone przez administratora.';
 			return false;
 		}
 
 		if (!$this->worker['is_activated'])
 		{
-			$this->message = '{error}Konto nie zostało aktywowane, sprawdź swoją pocztę email.';
+			$this->message = 'warn::Konto nie zostało aktywowane, sprawdź swoją pocztę email.';
 			return false;
+		}
+
+		$values = ['workerId' => $this->worker['id']];
+		$permissions = $this->db->run('SELECT * FROM permissions WHERE worker_id = :workerId', $values)->fetch();
+
+		array_shift($permissions);
+		foreach ($permissions as $permission => $value)
+		{
+			$_SESSION['permission'][$permission] = $value;
+			//setToSession nie wspiera tablic...
 		}
 		
 		setToSession('workerId', $this->worker['id']);
 		setToSession('workerName', $this->worker['name']);
 		setToSession('workerLogin', $this->worker['login']);
+		setToSession('workerSecurityToken', $this->worker['security_token']);
 
 		return true;
 	}
 
-	public function setLogin(string $login)
+	private function reloadPrivileges()
 	{
-		$this->login = $login;
-	}
-
-	public function setPassword(string $password)
-	{
-		$this->password = $password;
-	}
-
-	public function getMessage()
-	{
-		return $this->message;
+		
 	}
 
 	private function preparePassword(string $password)

@@ -10,29 +10,38 @@ if ($action == 'redir') {
 	// $view->renderSingle('account-login-form');
 
 }
-	$workerId = $_SESSION['workerId'];
 
-	$settingstModel = new SettingsModel($model);
-	$settingstView = new SettingsView($view);
+$workerId = getFromSession('workerId');
 
-	$data = $settingstModel->index(['workerId' => $workerId]);
-	$settingstView->index($data);
-	$view->render();
+$settings = new Settings($db);
+$data = $settings->index();
 
-	exit('o tak');
+foreach ($data['workers'] as $key => $worker)
+{
+	if ($worker['is_disabled'])
+	{
+		$manage = 'Odblokuj';
+		$manageUrl = 'enable';
+	}
+	else
+	{
+		$manage = 'Zablokuj';
+		$manageUrl = 'disable';
+	}
+	
+	$data['workers'][$key]['manage'] = $manage;
+	$data['workers'][$key]['manageUrl'] = $manageUrl;
 
+	$data['workers'][$key]['status'] = $worker['is_activated'] ? 'Aktywne' : 'Nieaktywne';
+}
 
+$view->addData($data);
+$view->addView('settings');
 
+$view->joinJS('settings');
+$view->render();
 
-
-
-
-v('s');
-
-$db = new Database;
-$validate = new Validate;
-$urlParser = new UrlParser;
-$message = new Message;
+exit;
 
 // $test = $_GET['test'];
 // echo $test .' :: ';

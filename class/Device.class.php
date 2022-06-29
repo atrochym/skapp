@@ -25,6 +25,11 @@ class Device
 		return $createId;
 	}
 
+	public function getReceives() // chcę to tutaj?
+	{
+		
+	}
+
 	public function getData()
 	{
 		if ($this->deviceId < 1)

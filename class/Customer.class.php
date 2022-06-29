@@ -9,22 +9,26 @@ class Customer
 	public function __construct(private Database $db)
 	{}
 
-	public function setCustomerId(int $customerId)
+
+	public function getAllCustomers() // chcę to tutaj?
 	{
-		// if ($customerId < 1)
-		// {
-		// 	$this->message = 'warn::Niepoprawny identyfikator klienta.'; // użyć?
-		// 	return;
-		// }
-		$this->customerId = $customerId;
+		$customers = $this->db->run('SELECT * FROM customers', [])->fetchAll();
+
+		if (!$customers)
+		{
+			$this->message = 'info::Baza klientów jest pusta.';
+			return false;
+		}
+
+		return $customers;
 	}
 
 	public function create(array $customer)
 	{
-		$data = [
+		$values = [
 			'phone' => $customer['phone']
 		];
-		$customerExist = $this->db->run('SELECT id, name FROM customers WHERE phone = :phone AND deleted = 0 LIMIT 1', $data)->fetch();
+		$customerExist = $this->db->run('SELECT id, name FROM customers WHERE phone = :phone AND deleted = 0 LIMIT 1', $values)->fetch();
 
 		if ($customerExist)
 		{
@@ -34,14 +38,14 @@ class Customer
 			// return true;
 		}
 
-		$data = [
+		$values = [
 			'creator_id' => getFromSession('workerId'),
 			'phone' => &$customer['phone'],
 			'name' => &$customer['name'],
 			'email' => &$customer['email'],
 			'non_polish' => &$customer['language']
 		];
-		$customerId = $this->db->insert('customers', $data);
+		$customerId = $this->db->insert('customers', $values);
 
 		$this->message = 'success::Zarejestrowano pomyślnie.';
 		$this->setCustomerId($customerId);
@@ -56,8 +60,8 @@ class Customer
 			return;
 		}
 
-		$data = ['phone' => $customer['phone']];
-		$exec = $this->db->run('SELECT id FROM customers WHERE phone = :phone LIMIT 1', $data)->fetch();
+		$values = ['phone' => $customer['phone']];
+		$exec = $this->db->run('SELECT id FROM customers WHERE phone = :phone LIMIT 1', $values)->fetch();
 
 		if ($exec && $exec['id'] !== (int) $customer['customerId'])
 		{
@@ -65,14 +69,14 @@ class Customer
 			return false;
 		}
 
-		$data = [
+		$values = [
 			'customer_id' => $customer['customerId'],
 			'phone' => $customer['phone'],
 			'name' => $customer['name'],
 			'email' => $customer['email'],
 			'non_polish' => $customer['language']
 		];
-		$this->db->run('UPDATE customers SET phone = :phone, name = :name, email = :email, non_polish = :non_polish WHERE id = :customer_id', $data);
+		$this->db->run('UPDATE customers SET phone = :phone, name = :name, email = :email, non_polish = :non_polish WHERE id = :customer_id', $values);
 		
 		$this->message = 'success::Zmiany dla ' . $customer['phone'] . ' zostały zapisane.';
 	}
@@ -84,14 +88,14 @@ class Customer
 			return;
 		}
 	
-		$data = ['customerId' => $this->customerId];
+		$values = ['customerId' => $this->customerId];
 		$devices = $this->db->run(
 			'SELECT d.id AS device_id, producer, model, serial_number, d.created, d.notice, r.id AS receive_id, issue, sticker, finished
 			FROM devices AS d 
 			LEFT OUTER JOIN receives AS r ON d.id = r.device_id 
 			WHERE d.deleted = 0 AND (r.deleted = 0 OR r.deleted IS NULL) AND d.customer_id = :customerId
 			ORDER BY receive_id DESC',
-			$data)->fetchAll();
+			$values)->fetchAll();
 
 		return $devices;
 	}
@@ -110,8 +114,8 @@ class Customer
 			// return 'wtf';
 		}
 
-		$data = ['customerId' => $this->customerId];
-		$customer = $this->db->run('SELECT *, id AS customerId FROM customers WHERE id = :customerId', $data)->fetch();
+		$values = ['customerId' => $this->customerId];
+		$customer = $this->db->run('SELECT *, id AS customerId FROM customers WHERE id = :customerId', $values)->fetch();
 
 		if (!$customer)
 		{
@@ -121,5 +125,10 @@ class Customer
 
 		$this->customer = $customer;
 		return $this->customer;
+	}
+
+	public function setCustomerId(int $customerId)
+	{
+		$this->customerId = $customerId;
 	}
 }

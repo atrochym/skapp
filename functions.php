@@ -1,5 +1,16 @@
 ﻿<?php
 
+function classLoader($className) {
+	// $className = strtolower($className);
+	$classFile = "class/$className.class.php";
+
+	if (!file_exists($classFile)) {
+		throw new Exception('classLoader: missing class '.$className);
+	}
+	require_once($classFile);
+	return;
+}
+
 
 function nameOfDay($date) {
 	switch(date('w', strtotime($date))){
@@ -11,22 +22,6 @@ function nameOfDay($date) {
 		case 5 : return "pt"; break;
 		case 6 : return "sb"; break;
 	}
-}
-
-
-function genDeviceTag($lastTag) { // do wywalenia
-	if ((int)strlen($lastTag) < 5) {
-		throw new Exception('genDeviceID not correct');
-	}
-
-	$month = substr($lastTag, -4, 2);
-	$year = substr($lastTag, -2, 2);
-	$deviceTag = substr($lastTag, 0, -4);
-	
-	$deviceTag = $year <> date('y') ? 1 : $deviceTag;
-	$deviceTag = $month <> date('m') ? 1 : ++$deviceTag;
-	
-	return $deviceTag . date('my');
 }
 
 function longDate($datetime, $showTime=false) {
@@ -60,7 +55,7 @@ function workerLoggedIn() {
 	return false;
 }
 
-function labelIdToName($labelCode) {
+function labelIdToName($labelCode) { // sprawdzić czy użwana, usunąć
 	switch($labelCode) {
 		case '10';
 			$label['name'] = 'Czeka na części';
@@ -86,7 +81,7 @@ function labelIdToName($labelCode) {
 	return $label;
 }
 
-function formBackup($field = '') {
+function formBackup($field = '') { // do usunięcia, sprawa dla localstorage
 	if ($field) {
 		$value = isset($_SESSION['form_backup'][$field]) ? $_SESSION['form_backup'][$field] : '';
 		unset($_SESSION['form_backup'][$field]);
@@ -217,19 +212,6 @@ function logToFile(string $data, string $file = 'main.log')
 	}
 	fclose($resource);
 }
-
-// function redirect($destination)
-// {
-// 	if ($destination == 'back')
-// 	{
-// 		//  kosnstruktorze kontrolera więcej o tej zmiennej
-// 		header($_SESSION['locationUrl']['previous']);
-// 		exit;
-// 	}
-
-// 	header('Location: ' . DIR . $destination);
-// 	exit;
-// }
 
 function setMessage(string $message)
 {

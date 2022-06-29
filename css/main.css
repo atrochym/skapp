@@ -395,7 +395,7 @@ button.service-top-menu:hover {
   background-color: #0174ab;
 }
 
-.message-empty {
+.message-hidden {
   display: none;
 }
 

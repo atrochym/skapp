@@ -1,8 +1,7 @@
 <?php
 
-// require_once ('index.php');
 $serviceId = $controller->id();
-// $serviceModel = new ServiceModel($model, $serviceId);
+
 $service = new Service($db);
 $service->setServiceId($serviceId);
 
@@ -30,7 +29,6 @@ if ($action == 'assign-part')
 elseif ($action == 'unplug-part')
 {
 	$result = $serviceModel->unplugPart();
-
 }
 elseif ($action == 'delete')
 {
@@ -58,8 +56,38 @@ elseif ($action == 'incomplete')
 }
 elseif ($action == 'create')
 {
-	// TODO
-	ve($_POST);
+	$validate = new Validate;
+	$validate->add('receiveId', $_POST['receiveId'], 'require integer');
+
+	if(!$validate->getValid())
+	{
+		setMessage('error::Błąd przesyłania danych formularza.');
+		$controller->redirect('back');
+	}
+
+	$validData = $validate->getValidData();
+
+	foreach ($_POST['solution'] as $key => $value) // jest też w receive.php
+	{
+		$validate->add('name', $value['name'], 'require text 3 100');
+		$validate->add('price', $value['price'], 'require interval 1 9');
+
+		if (!$validate->getValid())
+		{
+			setMessage('error::Wystąpił błąd podczas walidacji danych.');
+			$controller->redirect('back');
+		}
+
+		$validData['solution'][$key]['name'] = $validate->name;
+		$validData['solution'][$key]['price'] = $validate->price;
+	}
+
+	$service = new Service($db);
+	$service->create($validData);
+
+	setMessage($service->message);
+	$controller->redirect('back');
+
 }
 elseif ($action == 'update')
 {

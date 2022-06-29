@@ -5,141 +5,96 @@ use PHPMailer\PHPMailer\SMTP;
 
 class Account
 {
-	private string $fullName, $email;
 	public string $message;
-	public array $worker;
+	public array $worker = [];
+	private int $workerId;
 
-	public function __construct(private Database $db, private Validate $validate)
+	public function __construct(private Database $db)
+	{}
+
+	public function create(array $data)
 	{
-		
-	}
-
-	public function create()
-	{
-		$this->validate->add('fullName', $this->fullName, 'fullname require 6 40');
-		$this->validate->add('email', $this->email, 'email require 8 60');
-
-		if(!$this->validate->getValid())
-		{
-			if($this->validate->_fieldFail == 'fullName')
-			{
-				$this->message = '{warn}Imię i Nazwisko może zawierać wyłącznie znaki a-ź, spację oraz minimum 6, maksymalnie 40 znaków.';
-				return false;
-			}
-
-			if ($this->validate->_fieldFail == 'email')
-			{
-				$this->message = '{warn}E-mail ma nieprawidłowy format lub długość.';
-				return false;
-			}
-
-			$this->message = '{error}Nie udało się stworzyć konta (validate failed).';
-			return false;
-		}
-
-		require './PHPMailer-skapp/src/Exception.php';
-		require './PHPMailer-skapp/src/PHPMailer.php';
-		require './PHPMailer-skapp/src/SMTP.php';
-
-		$data = ['email' => $this->validate->email];
-		$result = $this->db->run("SELECT id FROM workers WHERE email = :email", $data);
+		$values = ['email' => $data['email']];
+		$result = $this->db->run("SELECT id FROM workers WHERE email = :email", $values);
 
 		if ($result->rowCount())
 		{
-			$this->message = '{warn}Adres ' . $this->validate->email . ' już jest zajęty.';
+			$this->message = 'warn::Adres "' . $data['email'] . '" jest przypisany do innego pracownika.';
 			return false;
 		}
 
 		$tempPassword = substr(md5(rand() . 'tmp'), 0, 20);
-		$tempLogin = str_replace([' ', 'ą', 'ć', 'ę', 'ł', 'ń', 'ó', 'ś', 'ż', 'ź'], ['', 'a', 'c', 'e', 'l', 'n', 'o', 's', 'z', 'z'], strtolower($this->validate->fullName));
+		$tempLogin = str_replace([' ', 'ą', 'ć', 'ę', 'ł', 'ń', 'ó', 'ś', 'ż', 'ź'], ['', 'a', 'c', 'e', 'l', 'n', 'o', 's', 'z', 'z'], strtolower($data['fullName']));
 
-		$data = [
+		$values = [
 			'login' => $tempLogin . '_temp',
-			'name' => $this->validate->fullName,
-			'email' => $this->validate->email,
+			'name' => $data['fullName'],
+			'email' => $data['email'],
 			'password' => $tempPassword,
 			'security_token' => $this->makeToken()
 		];
-		$newWorkerId = $this->db->insert('workers', $data);
+		$newWorkerId = $this->db->insert('workers', $values);
 		$token =  $this->makeToken(15);
 
-		$data = [
+		$values = [
 			'worker_id' => $newWorkerId,
 			'worker_login' => $tempLogin.'_temp',
 			'token' => $token,
 			'ip' => $_SERVER['REMOTE_ADDR']
 		];
 
-		$this->db->insert('password_changes', $data);
+		$this->db->insert('password_changes', $values);
 
 		$activationUrl = "http://atdev.ddns.net/sk/account/proceed-register/$tempLogin/$token";
 		$subject = 'Studio-Komp - rejestracja użytkownika.';
-		$body = 'Cześć '.$this->validate->fullName.', Twoje konto zostało utworzone. Kliknij w link i dokończ konfigurację konta. <br><br><a href="'.$activationUrl.'">'.$activationUrl.'</a> ';
+		$body = 'Cześć '.$data['fullName'].', Twoje konto zostało utworzone. Kliknij w link i dokończ konfigurację konta. <br><br><a href="'.$activationUrl.'">'.$activationUrl.'</a> ';
 
-		$result = $this->sendEmail($this->validate->email, $subject, $body);
+		$result = $this->sendEmail($data['email'], $subject, $body);
 
 		if (!$result)
 		{
-			$this->message = '{error}Błąd podczas wysyłania linka aktywacyjnego. Adres odbiorcy jest poprany? Możesz podesłać ten link: '.$activationUrl;
+			$this->message = 'error::Błąd podczas wysyłania linka aktywacyjnego. Adres odbiorcy jest poprany? Możesz podesłać ten link: '.$activationUrl; // tymczasowe
 			return false;
 		}
 
-		$this->message = '{success}Pracownik został zarejestrowany i otrzymał mail z linkiem aktywacyjnym.';
+		$this->message = 'success::Pracownik został zarejestrowany i otrzymał mail z linkiem aktywacyjnym.';
 		return true;
 	}
 
 	public function proceedRegister(array $data)
 	{
-		$this->validate->add('name', $data['urlName'], 'alnum require');
-		$this->validate->add('token', $data['urlToken'], 'alnum require');
-
-		if (!$this->validate->getValid())
-		{
-			$this->message = '{warn}Link do konfiguracji konta jest niepoprawny.';
-			return false;
-		}
-
-		$data = [
-			'login' => $this->validate->name . '_temp',
-			'token' => $this->validate->token,
+		$values = [
+			'login' => $data['name'] . '_temp',
+			'token' => $data['token'],
 		];
 
-		$worker = $this->db->run('SELECT id, worker_id FROM password_changes WHERE worker_login = :login AND token = :token AND is_valid = 1', $data)->fetch();
+		$worker = $this->db->run('SELECT id, worker_id FROM password_changes WHERE worker_login = :login AND token = :token AND is_valid = 1', $values)->fetch();
 
 		if (!$worker)
 		{
-			$this->message = '{warn}Link do konfiguracji konta jest niepoprawny lub wygasł.';
+			$this->message = 'warn::Link do konfiguracji konta jest niepoprawny lub wygasł.';
 			return false;
 		}
 
 		$this->worker['id'] = $worker['worker_id'];
-		$this->worker['name'] = $this->validate->name;
-		$this->worker['token'] =  $this->validate->token;
+		$this->worker['name'] = $data['name'];
+		$this->worker['token'] =  $data['token'];
 		
 		return true;
 	}
 
 	public function proceedResetPassword(array $data)
 	{
-		$this->validate->add('login', $data['urlLogin'], ('alnum require'));
-		$this->validate->add('token', $data['urlToken'], ('alnum require'));
-
-		if (!$this->validate->getValid())
-		{
-			$this->message = '{warn}Link resetowania hasła jest niepoprawny.';
-			return false;
-		}
-
-		$data = [
-			'login' => $this->validate->login,
-			'token' => $this->validate->token,
+		$values = [
+			'login' => $data['login'],
+			'token' => $data['token'],
 		];
 
-		$exec = $this->db->run('SELECT id, worker_id FROM password_changes WHERE worker_login = :login AND token = :token AND is_valid = 1', $data)->fetch();
+		$exec = $this->db->run('SELECT id, worker_id FROM password_changes WHERE worker_login = :login AND token = :token AND is_valid = 1', $values)->fetch();
 
 		if (!$exec)
 		{
-			$this->message = '{warn}Link resetowania hasła jest niepoprawny lub wygasł.';
+			$this->message = 'warn::Link resetowania hasła jest niepoprawny lub wygasł.';
 			return false;
 		}
 
@@ -148,169 +103,174 @@ class Account
 		$this->worker['id'] = $exec['worker_id'];
 		$this->worker['name'] = $worker['name'];
 		$this->worker['login'] = $worker['login'];
-		$this->worker['token'] = $this->validate->token;
+		$this->worker['token'] = $data['token'];
 
 		return true;
 	}
 
 	public function passwordChange(array $data)
 	{
-		$this->validate->add('password', $data['password'], 'password 8 20');
-		$this->validate->add('workerId', $data['worker_id'], 'integer require');
-		$this->validate->add('token', $data['token'], 'alnum require');
-
-		if (!$this->validate->getValid())
-		{
-			if ($this->validate->_fieldFail == 'password')
-			{
-				$this->message = '{warn}Hasło powinno mieć długość między 8 a 20 znaków.';
-				return false;
-			}
-
-			$this->message = '{warn}Nie można zresetować hasła dla tego użytkownika (valid failed).';
-			return false;
-		}
-
-		if($this->validate->password !=  $data['password_repeat'])
-		{
-			$this->message = '{warn}Oba hasła powiny być identyczne.';
-			return false;
-		}
-
-		$data = [
-			'workerId' => $this->validate->workerId,
-			'token' => $this->validate->token,
+		$values = [
+			'workerId' => $data['workerId'],
+			'token' => $data['token'],
 		];
 		
-		$request = $this->db->run('SELECT id FROM password_changes WHERE worker_id = :workerId AND token = :token AND is_valid = 1 LIMIT 1', $data)->fetch();
+		$request = $this->db->run('SELECT id FROM password_changes WHERE worker_id = :workerId AND token = :token AND is_valid = 1 LIMIT 1', $values)->fetch();
 
-		$this->worker['id'] = $this->validate->workerId; // dla preparePassword
+		if (!$request)
+		{
+			$this->message = 'error::Żądanie resetowania hasła nie zostało odnalezione.';
+			return false;
+		}
 
-		$data = [
-			'password' => $this->preparePassword($this->validate->password),
-			'workerId' => $this->validate->workerId,
+		$this->worker['id'] = $data['workerId']; // dla preparePassword, może jakoś inaczej?
+
+		$values = [
+			'password' => $this->preparePassword($data['password']),
+			'workerId' => $data['workerId'],
 		];
-		$this->db->run('UPDATE workers SET password = SHA2(:password, 256) WHERE id = :workerId', $data);
+		$this->db->run('UPDATE workers SET password = SHA2(:password, 256) WHERE id = :workerId', $values);
 		$this->db->run('UPDATE password_changes SET is_valid = 0 WHERE id = :id', ['id' => $request['id']]);
-		$worker = $this->db->run('SELECT name FROM workers WHERE id = :id', ['id' => $this->validate->workerId])->fetch();
+		$worker = $this->db->run('SELECT name FROM workers WHERE id = :id', ['id' => $data['workerId']])->fetch();
 
-		$this->message = 'Hasło dla '. $worker['name'] .' zostało zmienione, zaloguj się.';
+		$this->message = 'success::Hasło dla '. $worker['name'] .' zostało zmienione, zaloguj się.';
 		return true;
 	}
 
 	public function createPassword(array $data)
 	{
-		$this->validate->add('login', $data['login'], ('login require 4 30'));
-		$this->validate->add('password', $data['password'], ('password require 8 20'));
-		$this->validate->add('workerId', $data['worker_id'], ('integer require'));
-		$this->validate->add('token', $data['token'], ('alnum require'));
-		$passwordRepeat = trim($data['password_repeat']);
-
-		if (!$this->validate->getValid())
-		{
-			if ($this->validate->_fieldFail == 'login')
-			{
-				$this->message = '{warn}Login ma nieprawidłowy format lub długość. Poprawna długość to 4-30 znaków.';
-				return false;
-			}
-
-			if ($this->validate->_fieldFail == 'password')
-			{
-				$this->message = '{warn}Hasło powinno mieć długość między 8 a 20 znaków.';
-				return false;
-			}
-
-			$this->message = 'Dane wejściowe są niepoprawne (valid failed).';
-			return false;
-		}
-
-		if($this->validate->password != $passwordRepeat)
-		{
-			$this->message = 'Oba hasła powiny być identyczne.';
-			return false;
-		}
-
-		$data = [
-			'login' => $this->validate->login,
+		$values = [
+			'login' => $data['login'],
 		];
 
-		$exec = $this->db->run('SELECT id FROM workers WHERE login = :login', $data);
+		$exec = $this->db->run('SELECT id FROM workers WHERE login = :login', $values)->fetch();
 
-		if ($exec->rowCount())
+		if ($exec)
 		{
-			$this->message = 'Ten login jest już zajęty.';
+			$this->message = 'info::Ten login jest już zajęty.';
 			return false;
 		}
 
-		$data = [
-			'worker_id' => $this->validate->workerId,
-			'token' => $this->validate->token,
+		$values = [
+			'worker_id' => $data['workerId'],
+			'token' => $data['token'],
 		];
 
-		$exec = $this->db->run('SELECT id FROM password_changes WHERE worker_id = :worker_id AND token = :token AND is_valid = 1 LIMIT 1', $data)->fetch();
+		$exec = $this->db->run('SELECT id FROM password_changes WHERE worker_id = :worker_id AND token = :token AND is_valid = 1 LIMIT 1', $values)->fetch();
 
 		if (!$exec)
 		{
-			$this->message = 'Link do konfiguracji konta jest niepoprawny lub stracił ważność.';
+			$this->message = 'info::Link do konfiguracji konta jest niepoprawny lub stracił ważność.';
 			return false;
 		}
 
-		$this->worker['id'] = $this->validate->workerId; // dla preparePassword
+		$this->worker['id'] = $data['workerId']; // dla preparePassword
 
-		$data = [
-			'password' => $this->preparePassword($this->validate->password),
-			'id' => $this->validate->workerId,
-			'login' => $this->validate->login,
+		$values = [
+			'password' => $this->preparePassword($data['password']),
+			'id' => $data['workerId'],
+			'login' => $data['login'],
 		];
 
-		$this->db->run('UPDATE workers SET password = SHA2(:password, 256), login = :login, is_activated = 1 WHERE id = :id', $data);
+		$this->db->run('UPDATE workers SET password = SHA2(:password, 256), login = :login, is_activated = 1 WHERE id = :id', $values);
 		$this->db->run('UPDATE password_changes SET is_valid = 0 WHERE id = :id', ['id' => $exec['id']]);
-		$this->db->insert('permissions', ['worker_id' => $this->validate->workerId]);
-		$this->worker = $this->db->run('SELECT name FROM workers WHERE id = :id', ['id' => $this->validate->workerId])->fetch();
+		$this->db->insert('permissions', ['worker_id' => $data['workerId']]);
+		$this->worker = $this->db->run('SELECT name FROM workers WHERE id = :id', ['id' => $data['workerId']])->fetch();
 
-		$this->message = 'Konfiguracja konta '. $this->worker['name'] .' została zakończona, zaloguj się.';
+		$this->message = 'success::Konfiguracja konta "'. $this->worker['name'] .'" została zakończona, zaloguj się.';
 		return true;
 	}
 
-	public function resetPassword(int $workerId)
+	public function resetPassword()
 	{
-		$worker = $this->db->run('SELECT * FROM workers WHERE id = :id LIMIT 1', ['id' => $workerId])->fetch();
-
-		if (!$worker)
+		if (!$this->getData() || $this->isPasswordResetBegin())
 		{
-			$this->message = 'Zresetowanie hasła nie było możliwe, pracownik nie istnieje.';
-			return false;
+			return;
 		}
 
-		// wywalić do innej metody
+		// przenieść do innej metody
 		$token = $this->makeToken(15);
-		$data = [
-			'worker_id' => $workerId,
-			'worker_login' => $worker['login'],
+		$values = [
+			'worker_id' => $this->workerId,
+			'worker_login' => $this->worker['login'],
 			'token' => $token,
 			'ip' => $_SERVER['REMOTE_ADDR']
 		];
 
-		$this->db->insert('password_changes', $data);
+		$this->db->insert('password_changes', $values);
 
-		$url = "http://atdev.ddns.net/sk/account/proceed-password/$worker[login]/$token";
+		$url = 'http://atdev.ddns.net/sk/account/proceed-password/'. $this->worker['login'] .'/'. $token;
 		$subject = 'Studio-Komp - resetowanie hasła.';
-		$body = 'Cześć '. $worker['name'].', procedura resetowania hasła została rozpoczęta. Kliknij w link i ustaw nowe hasło. <br><br><a href="'.$url.'">'.$url.'</a> ';
+		$body = 'Cześć '. $this->worker['name'].', procedura resetowania hasła została rozpoczęta. Kliknij w link i ustaw nowe hasło. <br><br><a href="'.$url.'">'.$url.'</a> ';
 
-		if (!$this->sendEmail($worker['email'], $subject, $body))
+		if (!$this->sendEmail($this->worker['email'], $subject, $body))
 		{
-			$this->message = 'Wystąpił błąd podczas wysyłania wiadomości email.';
+			$this->message = 'error::Wystąpił błąd podczas wysyłania wiadomości email.';
 			return false;
 		}
 
-		$this->message = 'Hasło dla użytkownika '. $worker['name'] .' zostało zresetowane. Otrzyma on maila z dalszymi instrukcjami.';
+		$this->message = 'success::Hasło dla użytkownika "'. $this->worker['name'] .'" zostało zresetowane. Otrzyma on maila z dalszymi instrukcjami.';
 		return true;
 	}
 
 	public function passwordChangeRequest()
 	{
-		
+
 	}
+
+	public function isPasswordResetBegin()
+	{
+		if (!$this->getData())
+		{
+			return;
+		}
+
+		$values = ['workerId' => $this->workerId];
+		$result = $this->db->run('SELECT id FROM password_changes WHERE worker_id = :workerId AND is_valid = 1', $values)->fetch();
+
+		if ($result)
+		{
+			$this->message = 'info::Procedura resetowania hasła dla '. $this->worker['name'] .' jest już w toku, nie można wdrożyć jej ponownie. (w sumie nie wiem co dalej)';
+			return $result;
+		}
+
+		return false;
+	}
+
+	public function disable()
+	{
+		if (!$this->getData())
+		{
+			return;
+		}
+
+		$values = [
+			'token' => $this->makeToken(10),
+			'workerId' => $this->workerId,
+		];
+
+		$this->db->run('UPDATE workers SET is_disabled = 1, security_token = :token WHERE id = :workerId', $values);
+		$this->message = 'success::Konto pracownika '. $this->worker['name'] .' zostało wyłączone.';
+		return true;
+	}
+
+	public function enable()
+	{
+		if (!$this->getData())
+		{
+			return;
+		}
+
+		$values = [
+			'token' => $this->makeToken(10),
+			'workerId' => $this->workerId,
+		];
+
+		$this->db->run('UPDATE workers SET is_disabled = 0, security_token = :token WHERE id = :workerId', $values);
+		$this->message = 'success::Konto pracownika '. $this->worker['name'] .' zostało włączone.';
+		return true;
+	}
+
 
 	public function logout()
 	{
@@ -325,9 +285,9 @@ class Account
 	{
 		try
 		{
-			require './PHPMailer-skapp/src/Exception.php';
-			require './PHPMailer-skapp/src/PHPMailer.php';
-			require './PHPMailer-skapp/src/SMTP.php';
+			require './PHPMailer/src/Exception.php';
+			require './PHPMailer/src/PHPMailer.php';
+			require './PHPMailer/src/SMTP.php';
 		
 			$mail = new PHPMailer(false); // true for log
 			// $mail->SMTPDebug = SMTP::DEBUG_SERVER;
@@ -344,7 +304,6 @@ class Account
 			$mail->AddAddress($addres);
 			$mail->Subject = $subject;
 			$mail->Body = $body;
-
 			$mail->Send();
 
 			return true;
@@ -362,42 +321,51 @@ class Account
 		return substr(md5(rand() . 'token'), 0, $lenght);
 	}
 
-	public function setFullName(string $fullName)
-	{
-		$this->fullName = $fullName;
-	}
-
-	public function setEmail(string $email)
-	{
-		$this->email = $email;
-	}
-
-	public function setLogin(string $login)
-	{
-		$this->login = $login;
-	}
-
-	public function setPassword(string $password)
-	{
-		$this->password = $password;
-	}
-
 	private function preparePassword(string $password)
 	{
 		$salt = $this->worker['id'] . 'id-sk-app';
 		return $salt . $password;
 	}
 	
-	private function getAccountData()
+	public function setWorkerId(int $workerId)
 	{
-		$data = ['login' => $this->login];
-		$result = $this->db->run("SELECT * FROM workers WHERE login = :login", $data);
+		$this->workerId = $workerId;
+	}
+
+	private function getData()
+	{
+		$data = ['workerId' => $this->workerId];
+		$result = $this->db->run('SELECT * FROM workers WHERE id = :workerId', $data);
 
 		if (!$result->rowCount())
 		{
-			$this->message = '{error}Konto o podanym loginie nie istnieje.';
+			$this->message = 'error::Konto o podanym loginie nie istnieje.';
 			return false;
 		}
+
+
+		if ((int) $this->workerId < 1)
+		{
+			$this->message = 'warn::Niepoprawny identyfikator pracownika.';
+			return false;
+		}
+
+		if ($this->worker)
+		{
+			return $this->worker;
+		}
+
+		$values = ['workerId' => $this->workerId];
+		$worker = $this->db->run('SELECT * FROM workers WHERE id = :workerId', $values)->fetch();
+
+		if (!$worker)
+		{
+			$this->message = 'warn::Pracownik o podanym identyfikatorze nie istnieje.';
+			return false;
+		}
+
+		$this->worker = $worker;
+		return $this->worker;
 	}
 }
 

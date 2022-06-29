@@ -1,145 +1,106 @@
 <?php
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
 
-// $model = new Model();
-// $view = new View($model->getData());
-
-// $urlParser = new UrlParser;
-// $action = $controller->action();
-
-if ($action == 'redir') {
-
-	$accountView = new AccountView($view);
-
-	$model->message->set(['messageContent' => 'Wymagane zalogowanie się.',
-						 'messageType' => '']);
-
-	$accountView->loginForm();
-	$view->renderSingle();
-
-}
-elseif ($action == 'login')
+if ($action == 'login')
 {
 	if (workerLoggedIn())
 	{
-		redirect('desktop');
+		$controller->redirect('dashboard');
 	}
 
 	$validate = new Validate;
-	$worker = new Worker($db, $validate);
-	$accountView = new AccountView($view);
+	$validate->add('login', $_POST['worker_login'], 'login require');
+	$validate->add('password', $_POST['worker_password'], 'password require');
 
-	formBackup();
-	// $data = [
-	// 	'workerLogin' => $_POST['worker_login'],
-	// 	'workerPassword' => $_POST['worker_password']
-	// ];
-
-	$worker->setLogin($_POST['worker_login']);
-	$worker->setPassword($_POST['worker_password']);
-
-	if (!$worker->login())
+	if (!$validate->getValid())
 	{
-		$view->addData([
-			'message' => $worker->getMessage()
-		]);
+		setMessage('error::Nieprawidłowy format loginu lub hasła.');
+		$controller->redirect('back');
 	}
 
+	$worker = new Worker($db);
+	$result = $worker->login($validate->getValidData());
 
-	// $result = $worker->login();
-	// $model->message->set($result);
+	if (!$result)
+	{
+		setMessage($worker->message);
+		$controller->redirect('account/login-form');
+	}
 
-	// if (!$result['success']) {
-
-		// $controller->redirect('back');
-	// }
-	
-	// a może sprawdzić po /redir/ z url?
-	if (isset($_SESSION['locationUrl']['afterLogin'])) {
+	if (isset($_SESSION['locationUrl']['afterLogin']))
+	{
 		$redirect = $_SESSION['locationUrl']['afterLogin'];
 		unset($_SESSION['locationUrl']['afterLogin']);
 		$controller->redirect($redirect);
 	}
 	
-	$controller->redirect('receive/new');
+	$controller->redirect('dashboard');
 
 
-} elseif ($action == 'login-form') {
-
-	// $accountModel = new AccountModel($model);
-	$accountView = new AccountView($view);
-
-	if (workerLoggedIn()) {
-		redirect('desktop');
+}
+elseif ($action == 'login-form')
+{
+	if (workerLoggedIn())
+	{
+		$controller->redirect('dashboard');
 	}
 
-	$accountView->loginForm();
+	$view->addView('account-login-form');
 	$view->renderSingle();
-
 
 }
 elseif ($action == 'logout')
 {
 	if (!workerLoggedIn())
 	{
-		redirect('account/login-form');
+		$controller->redirect('account/login-form');
 	}
 
-	$validate = new Validate;
-	$account = new Account($db, $validate);
-	$account->logout();
-	$model->message->set(['messageContent' => $account->message]);
+	session_destroy();
+	session_start();
+	setMessage('success::Wylogowano.');
 	$controller->redirect('account/login-form');
-
 }
 elseif ($action == 'reset-password')
 {
 	if (!workerLoggedIn())
 	{
-		ve('zaloguj sie');
-		redirect('desktop');
+		setMessage('warn::Wymagane zalogowanie się.');
+		$controller->redirect('account/login-form/redir');
 	}
 
 	$validate = new Validate;
-	$account = new Account($db, $validate);
+	$account = new Account($db);
+	$account->setWorkerId($controller->id());
+	$result = $account->resetPassword();
 
-
-	// $accountModel = new AccountModel($model);
-	$accountView = new AccountView($view);
-
-	$workerId = $controller->id();
-
-	$result = $account->resetPassword($workerId);
-
-	$model->message->set(['messageContent' => $account->message]);
-
+	setMessage($account->message);
 	$controller->redirect('back');
 
-} elseif ($action == 'proceed-password') {
-
-	if (workerLoggedIn()) {
-		redirect('desktop');
+}
+elseif ($action == 'proceed-password')
+{
+	if (workerLoggedIn())
+	{
+		$controller->redirect('dashboard');
 	}
+
 	$validate = new Validate;
-	$account = new Account($db, $validate);
+	$validate->add('login', $controller->paramNumber(1), ('alnum require'));
+	$validate->add('token', $controller->paramNumber(2), ('alnum require'));
 
-	$accountModel = new AccountModel($model);
-	$accountView = new AccountView($view);
+	if (!$validate->getValid())
+	{
+		setMessage('warn::Link resetowania hasła jest niepoprawny.');
+		$controller->redirect('account/login-form');
+	}
 
-	$data = [
-		'urlLogin' => trim($controller->paramNumber(1)),
-		'urlToken' => trim($controller->paramNumber(2))
-	];
-
-	$result = $account->proceedResetPassword($data);
+	$account = new Account($db);
+	$result = $account->proceedResetPassword($validate->getValidData());
 
 	if (!$result)
 	{
-		// $view->addData(['message' => $account->message]); // jak ogarnę komunikaty
-		$model->message->set(['messageContent' => $account->message]);
+		setMessage($account->message);
 		$controller->redirect('account/login-form');
-
 	}
 
 	$data = [
@@ -149,44 +110,75 @@ elseif ($action == 'reset-password')
 		'token' =>  $account->worker['token']
 	];
 
-	$accountView->proceedPasswordForm($data);
+	$view->addView('account-reset-password-form');
+	$view->addData($data);
 	$view->renderSingle();
 
 }
 elseif ($action == 'password-change')
 {
-	if (workerLoggedIn()) {
-		redirect('desktop');
+	if (workerLoggedIn())
+	{
+		$controller->redirect('dashboard');
 	}
+
 	$validate = new Validate;
-	$account = new Account($db, $validate);
+	$validate->add('password', $_POST['password'], 'password 8 20');
+	$validate->add('workerId', $_POST['worker_id'], 'integer require');// index z inputa wtf
+	$validate->add('token', $_POST['token'], 'alnum require');
 
-	// $accountModel = new AccountModel($model);
-	// $result = $accountModel->passwordChange($_POST);
+	if ($validate->getValid())
+	{
+		if($validate->password != $_POST['password_repeat'])
+		{
+			setMessage('info::Oba hasła powiny być identyczne.');
+			$controller->redirect('back');
+		}
 
-	$result = $account->passwordChange($_POST);
-
-	$model->message->set(['messageContent' => $account->message]);
-
-	if (!$result) {
-		$controller->redirect('back');
+		$account = new Account($db);
+		$result = $account->passwordChange($validate->getValidData());
+	
+		setMessage($account->message);
+		
+		$controller->redirect('account/login-form');
 	}
 
-	$controller->redirect('account/login-form');
+	if ($validate->_fieldFail == 'password')
+	{
+		setMessage('info::Hasło powinno mieć długość między 8 a 20 znaków.');
+	}
 
-} elseif ($action == 'create')
+	// setMessage('info::Nie można zresetować hasła dla tego użytkownika (valid failed).');
+	$controller->redirect('back');
+
+}
+elseif ($action == 'create')
 {
-	formBackup();
+	formBackup(); // wyleci
 
 	$validate = new Validate;
-	$account = new Account($db, $validate);
+	$validate->add('fullName', $_POST['name'], 'fullname require 6 40');
+	$validate->add('email', $_POST['email'], 'email require 8 60');
 
-	$account->setFullName($_POST['name']);
-	$account->setEmail($_POST['email']);
-	$account->create();
+	if($validate->getValid())
+	{
+		$account = new Account($db, $validate);
+		$account->create($validate->getValidData());
+	
+		setMessage($account->message);
+	}
 
-	// $view->addData(['message' => $account->message]);
-	$model->message->set(['messageContent' => $account->message]);
+	if($validate->_fieldFail == 'fullName')
+	{
+		setMessage('warn::Imię i Nazwisko może zawierać wyłącznie znaki a-ź, spację oraz minimum 6, maksymalnie 40 znaków.');
+	}
+
+	if ($validate->_fieldFail == 'email')
+	{
+		setMessage('warn::E-mail ma nieprawidłowy format lub długość.');
+	}
+
+	// setMessage('warn::Nie udało się stworzyć konta (validate failed).');
 	$controller->redirect('back');
 
 
@@ -194,22 +186,26 @@ elseif ($action == 'password-change')
 {
 	if (workerLoggedIn())
 	{
-		redirect('desktop');
+		$controller->redirect('dashboard');
 	}
 
 	$validate = new Validate;
-	$account = new Account($db, $validate);
-	$accountView = new AccountView($view);
+	$validate->add('name', $controller->paramNumber(1), 'alnum require');
+	$validate->add('token',$controller->paramNumber(2), 'alnum require');
 
-	$data = [
-		'urlName' => trim($controller->paramNumber(1)),
-		'urlToken' => trim($controller->paramNumber(2))
-	];
+	if (!$validate->getValid())
+	{
+		setMessage('warn::Link do konfiguracji konta jest niepoprawny.');
+		$controller->redirect('account/login-form');
+	}
 
-	if (!$account->proceedRegister($data))
+	$account = new Account($db);
+	$result = $account->proceedRegister($validate->getValidData());
+
+	if (!$result)
 	{
 		// $view->addData('message', $account->message); //użytć tego jak już ujednolice komunikaty
-		$model->message->set(['messageContent' => $account->message]);
+		setMessage($account->message);
 		$controller->redirect('account/login-form');
 	}
 
@@ -219,52 +215,80 @@ elseif ($action == 'password-change')
 		'token' => $account->worker['token'],
 	];
 
-	$accountView->proceedRegisterForm($data);
+	$view->addView('account-create-password-form');
+	$view->addData($data);
 	$view->renderSingle();
 
-} elseif ($action == 'create-password') {
-
-	if (workerLoggedIn()) {
-		redirect('desktop');
+}
+elseif ($action == 'create-password')
+{
+	if (workerLoggedIn())
+	{
+		$controller->redirect('dashboard');
 	}
 	
-	formBackup();
+	formBackup(); // wyleci
 
 	$validate = new Validate;
-	$account = new Account($db, $validate);
+	$validate->add('login', $_POST['login'], ('login require 4 30'));
+	$validate->add('password', $_POST['password'], ('password require 8 20'));
+	$validate->add('workerId', $_POST['worker_id'], ('integer require'));
+	$validate->add('token', $_POST['token'], ('alnum require'));
+	$passwordRepeat = trim($_POST['password_repeat']);
 
-	$result = $account->createPassword($_POST);
-	$model->message->set(['messageContent' => $account->message]);
-	// $view->addData('message', $account->message); //użytć tego jak już ujednolice komunikaty
-
-
-	if (!$result)
+	if ($validate->getValid())
 	{
-		$controller->redirect('back');
+		if ($validate->password != $passwordRepeat)
+		{
+			setMessage('warn::Oba hasła powiny być identyczne.');
+			$controller->redirect('back');
+		}
+
+		$account = new Account($db);
+		$result = $account->createPassword($validate->getValidData());
+		setMessage($account->message);
+
+		$controller->redirect('account/login-form');
 	}
 
-	$controller->redirect('account/login-form');
+	if ($validate->_fieldFail == 'login')
+	{
+		setMessage('warn::Login ma nieprawidłowy format lub długość. Poprawna długość to 4-30 znaków.');
+	}
 
+	if ($validate->_fieldFail == 'password')
+	{
+		setMessage('warn::Hasło powinno mieć długość między 8 a 20 znaków.');
+	}
 
-} elseif ($action == 'disable') {
-	$workerId = $controller->id();
-
-	$accountModel = new AccountModel($model);
-	$result = $accountModel->disableAccount($workerId);
-	$model->message->set($result);
+	// setMessage('warn::Dane wejściowe są niepoprawne (valid failed).');
 	$controller->redirect('back');
 
+}
+elseif ($action == 'disable')
+{
+	$account = new Account($db);
+	$account->setWorkerId($controller->id());
+	$account->disable();
 
-}  elseif ($action == 'enable') {
-	$workerId = $controller->id();
-
-	$accountModel = new AccountModel($model);
-	$result = $accountModel->enableAccount($workerId);
-	$model->message->set($result);
+	setMessage($account->message);
 	$controller->redirect('back');
 
-} elseif ($action == 'edit') {
+}
+elseif ($action == 'enable') // powtarzam podobny kod, ogarnąć
+{
+	$account = new Account($db);
+	$account->setWorkerId($controller->id());
+	$account->enable();
+
+	setMessage($account->message);
+	$controller->redirect('back');
+
+}
+elseif ($action == 'edit')
+{
 	echo '<br><br> TODO edit account worker';
+	exit;
 }
 
-// ivybe.ddns.net/sk/account/proceed-register/nazwiskoiimie/0d4bd044b12654e
+// atdev.ddns.net/sk/account/proceed-register/nazwiskoiimie/0d4bd044b12654e

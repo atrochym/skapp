@@ -8,9 +8,13 @@ class View {
 	private $resourcesJS = [];
 	private $resourcesCSS = [];
 
-	public function __construct(array $modelData) {
-		$this->message = new Message;
-		$this->addData($modelData);
+
+	public function __construct()
+	{
+		if(workerLoggedIn())
+		{
+			$this->addData(['workerName' => getFromSession('workerName')]);
+		}
 	}
 
 
@@ -22,9 +26,17 @@ class View {
 		$this->resourcesJS[] = $resource;
 	}
 
-	public function renderSingle() {
-		$message = $this->message->show();
-		$this->addData($message);
+	public function renderSingle()
+	{
+		$message = getMessage(); // zduplikowane, przemyśleć
+
+		if ($message)
+		{
+			$message = explode('::', $message);
+			$this->addData([
+				'message' => $message[1]
+			]);
+		}
 
 		extract($this->renderData);
 		$resource = 'templates/'.$this->views[0].'.phtml';

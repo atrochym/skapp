@@ -249,3 +249,32 @@ $(".change-worker-button").click(function() {
 
 });
 
+// set prediction date to next work day
+function setPredictionDate()
+{
+	let date = new Date;
+
+	if (date.getDay() >= 5)
+	{
+		date.setUTCDate(date.getDate() + 3);
+	}
+	else
+	{
+		date.setUTCDate(date.getDate() + 1);
+	}
+
+	return date.toLocaleDateString('en-CA');
+}
+
+document.querySelector('.prediction-date').value = setPredictionDate();
+document.querySelector('.prediction-date').addEventListener('change', (e) => {
+	let selectedDate = e.target.value.split('-');
+	let date = new Date;
+
+	date.setFullYear();
+
+	cl(selectedDate[0]);
+});
+
+// TODO sprawdź czy na dzień naprawy nie wybrano weekendu
+
