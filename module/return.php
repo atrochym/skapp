@@ -1,6 +1,6 @@
 <?php
 
-$receiveId = $controller->id();
+$receiveId = $router->getId();
 
 
 ?>

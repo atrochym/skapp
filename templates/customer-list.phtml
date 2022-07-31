@@ -11,15 +11,16 @@
 		</tr>		
 		<?php foreach ($customers as $customer) : 
 				extract($customer);
-				$deviceLink = "location.href='/sk/customer/$id'";
+				$urlMask = url('/customer/'.$id);
+				$deviceLink = "location.href='" . DIR . $urlMask ."'";
 		?>
 			<tr class="row">
 				<td class="col col1" onclick="<?= $deviceLink ?>"><?= $phone ?></td>
 				<td class="col col2" onclick="<?= $deviceLink ?>"><?= $name ?: '-' ?></td>
 				<td class="col col3" onclick="<?= $deviceLink ?>"><?= $email ?: '-' ?></td>
 				<td class="col col5">
-					<i class="icon fa fa-edit" title="Edytuj" onclick="location.href='/sk/customer/<?= $id ?>/edit'"></i>
-					<i class="icon fa fa-trash" title="Usuń" onclick="location.href='/sk/customer/<?= $id ?>/delete'"></i>
+					<a class="icon fa fa-edit" title="Edytuj" href="<?= DIR . $urlMask?>/edit"></a>
+					<a class="icon fa fa-trash" title="Usuń" href="<?= DIR . $urlMask?>/delete"></a>
 			</tr>
 		<?php endforeach; ?>
 	</table>

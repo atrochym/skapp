@@ -3,10 +3,10 @@
 <html>
 	<head>
 		<title><?= $siteTitle ?></title>
-		<link rel="stylesheet" href="<?= DIR ?>css/font-awesome.min.css">
-		<link rel="stylesheet" href="<?= DIR ?>css/main.css">
+		<link rel="stylesheet" href="<?=DIR?>/css/font-awesome.min.css">
+		<!-- <link rel="stylesheet" href="<?=DIR?>css/main.css"> -->
 		<?php	foreach ($resourcesCSS as $resource): ?>
-		<link rel="stylesheet" href="<?= DIR ?>css/<?= $resource ?>.css">
+		<link rel="stylesheet" href="<?=DIR?>/css/<?= $resource ?>.css">
 		<?php	endforeach; ?>
 
 		<link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,13 +29,13 @@
 				<a class="header-icon-box" href="#">
 					<i class="fa header-icon-box-fa fa-bell"></i>
 				</a>
-				<a class="header-icon-box" href="<?= DIR ?>account">
+				<a class="header-icon-box" href="<?=DIR?>/account">
 					<i class="fa header-icon-box-fa fa-user"></i>
 				</a>
-				<a class="header-icon-box" href="<?= DIR ?>settings">
+				<a class="header-icon-box" href="<?=DIR?>/settings">
 					<i class="fa header-icon-box-fa fa-gear"></i>
 				</a>
-				<a class="header-icon-box" href="<?= DIR ?>account/logout">
+				<a class="header-icon-box" href="<?=DIR?>/account/logout">
 					<i class="fa header-icon-box-fa fa-bed"></i>
 				</a>
 			</div>

@@ -12,7 +12,7 @@ class Customer
 
 	public function getAllCustomers() // chcę to tutaj?
 	{
-		$customers = $this->db->run('SELECT * FROM customers', [])->fetchAll();
+		$customers = $this->db->run('SELECT * FROM customers')->fetchAll();
 
 		if (!$customers)
 		{
@@ -25,10 +25,7 @@ class Customer
 
 	public function create(array $customer)
 	{
-		$values = [
-			'phone' => $customer['phone']
-		];
-		$customerExist = $this->db->run('SELECT id, name FROM customers WHERE phone = :phone AND deleted = 0 LIMIT 1', $values)->fetch();
+		$customerExist = $this->db->run('SELECT id, name FROM customers WHERE phone = :phone AND deleted = 0 LIMIT 1', $customer['phone'])->fetch();
 
 		if ($customerExist)
 		{
@@ -60,8 +57,7 @@ class Customer
 			return;
 		}
 
-		$values = ['phone' => $customer['phone']];
-		$exec = $this->db->run('SELECT id FROM customers WHERE phone = :phone LIMIT 1', $values)->fetch();
+		$exec = $this->db->run('SELECT id FROM customers WHERE phone = :phone LIMIT 1', $customer['phone'])->fetch();
 
 		if ($exec && $exec['id'] !== (int) $customer['customerId'])
 		{
@@ -88,14 +84,13 @@ class Customer
 			return;
 		}
 	
-		$values = ['customerId' => $this->customerId];
 		$devices = $this->db->run(
 			'SELECT d.id AS device_id, producer, model, serial_number, d.created, d.notice, r.id AS receive_id, issue, sticker, finished
 			FROM devices AS d 
 			LEFT OUTER JOIN receives AS r ON d.id = r.device_id 
 			WHERE d.deleted = 0 AND (r.deleted = 0 OR r.deleted IS NULL) AND d.customer_id = :customerId
 			ORDER BY receive_id DESC',
-			$values)->fetchAll();
+			$this->customerId)->fetchAll();
 
 		return $devices;
 	}
@@ -114,8 +109,7 @@ class Customer
 			// return 'wtf';
 		}
 
-		$values = ['customerId' => $this->customerId];
-		$customer = $this->db->run('SELECT *, id AS customerId FROM customers WHERE id = :customerId', $values)->fetch();
+		$customer = $this->db->run('SELECT *, id AS customerId FROM customers WHERE id = :customerId', $this->customerId)->fetch();
 
 		if (!$customer)
 		{

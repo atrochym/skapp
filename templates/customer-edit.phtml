@@ -1,5 +1,6 @@
-<form action="/sk/customer/update" method="post">
-	<input type="hidden" name="customer_id" value="<?= $customerId ?>">
+<form action="<?=DIR?>/customer/update" method="post">
+	<!-- <input type="hidden" name="customer_id" value="<?= $customerId ?>"> -->
+	<input type="hidden" name="customer_id" value="<?= maskId($customerId) ?>">
 	<div class="content-box">
 		<h2 class="title">Klient</h2>
 		<label class="field-first label-small">Numery telefonu
@@ -23,7 +24,7 @@
 		</label>
 	</div>
 	<div class="buttons-box">
-		<a class="button-gray save" href="/sk/receive/customer/<?= $customerId ?>">Anuluj</a>
+		<a class="button-gray save" href="/sk/customer/<?= $customerId ?>">Anuluj</a>
 		<button class="button-blue save" type="submit">Zapisz</button>
 	</div>
 </form>

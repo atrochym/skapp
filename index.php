@@ -3,48 +3,65 @@
 require 'config.php';
 require 'functions.php';
 
-spl_autoload_register('classLoader');
+// spl_autoload_register('classLoader');
 session_start();
 
-$controller = new Controller;
+// ve($_SERVER);
+
+$router = new Router;
 $db = new Database;
-$view = new View;
+// $view = new View;
 
 
-$module = $controller->loadModule();
-$action = $controller->action();
-$id = $controller->id();
+// $module = $router->getModule();
+// $action = $router->getAction();
+// $id = $router->getId();
 
-if (!$_SESSION['workerId'] && $module !== 'module/account.php')
-{
-	setMessage('warn::Wymaganie zalogowanie się.');
+// if (!isset($_SESSION['workerId']) && $module !== 'module/account.php')
+// {
+// 	// setMessage('warn::Wymaganie zalogowanie się.');
 	
-	$_SESSION['locationUrl']['afterLogin'] = $_SESSION['locationUrl']['this']; // zapakować w funkcję czy coś
+// 	$_SESSION['locationUrl']['afterLogin'] = $_SESSION['locationUrl']['this']; // zapakować w funkcję czy coś
 
-	$controller->redirect('account/login-form/redir');
-}
+// 	$router->redirect('/account/login-form/redir');
+// }
 
 if(workerLoggedIn())
 {
 	$workerId = getFromSession('workerId');
-	$values = ['workerId' => $workerId];
-	$worker = $db->run('SELECT security_token FROM workers WHERE id = :workerId LIMIT 1', $values)->fetch();
+	$worker = $db->run('UPDATE workers SET last_active = NOW() WHERE id = :workerId LIMIT 1', $workerId);
+	$worker = $db->run('SELECT security_token FROM workers WHERE id = :workerId LIMIT 1', $workerId)->fetch();
 
 	if ($worker['security_token'] != getFromSession('workerSecurityToken'))
 	{
-		$account = $db->run('SELECT is_disabled FROM workers WHERE id = :workerId LIMIT 1', $values)->fetch();
+		$trustedDevice = getFromSession('trustedDevice');
+		$trustedDevice = $db->run('SELECT deleted FROM workers_devices WHERE id = :id LIMIT 1', $trustedDevice)->fetch();
 
-		if ($account['is_disabled'])
+		if ($trustedDevice['deleted'])
 		{
 			session_destroy();
 			session_start();
+			session_regenerate_id(true);
+
+			// nie mam lepszego pomysłu
+			setMessage('info::Zostałeś wylogowany.');
+			$router->redirect('/account/login-form');
+		}
+
+		$account = $db->run('SELECT disabled FROM workers WHERE id = :workerId LIMIT 1', $workerId)->fetch();
+
+		if ($account['disabled'])
+		{
+			session_destroy();
+			session_start();
+			session_regenerate_id(true);
 
 			// nie mam lepszego pomysłu
 			setMessage('error::Twoje konto zostało dezaktywowane przez administratora.');
-			$controller->redirect('account/login-form');
+			$router->redirect('/account/login-form');
 		}
 
-		$permissions = $db->run('SELECT * FROM permissions WHERE worker_id = :workerId', $values)->fetch(); // zduplikowane w class worker po logowaniu
+		$permissions = $db->run('SELECT * FROM permissions WHERE worker_id = :workerId', $workerId)->fetch(); // zduplikowane w class worker po logowaniu
 
 		array_shift($permissions);
 		foreach ($permissions as $permission => $value)
@@ -52,7 +69,7 @@ if(workerLoggedIn())
 			$_SESSION['permission'][$permission] = $value;
 		}
 
-		$token = substr(md5(rand() . 'token'), 0, 10); // jest zduplikowana do metody w class worker
+		$token = substr(sha1(rand() . 'token'), 0, 15); // jest zduplikowana do metody w class worker
 		$values = [
 			'token' => $token,
 			'workerId' => $workerId,
@@ -62,11 +79,57 @@ if(workerLoggedIn())
 		if (!$updateToken) {
 			session_destroy();
 			session_start();
+			session_regenerate_id(true);
 			throw new Exception('ERR: update token failed.'); // dla testu
 		}
 
-		$_SESSION['workerSecurityToken'] = $token;
+		setToSession('workerSecurityToken', $token);
+	}
+
+	if (!getFromSession('trustedDevice') && $router->getModule() !== 'module/account.php')
+	{
+		$router->redirect('/account/register-device');
 	}
 }
-v('s');
+else
+{
+	$workerId = unmaskWorkerId(getFromCookie('workerId'));
+	$auth = checkAuth($db, getFromCookie('auth'));
+
+	if ($workerId && $auth)
+	{
+		$worker = new Worker($db);
+		$worker->setWorkerId($workerId);
+
+		if ($worker->autologin())
+		{
+			if (isset($_SESSION['locationUrl']['previous']))
+			{
+				$redirect = $_SESSION['locationUrl']['previous'];
+				// unset($_SESSION['locationUrl']['afterLogin']);
+				$router->redirect($redirect);
+			}
+		}
+	}
+	else
+	{
+		setcookie('auth', '', 0, '/');
+	}
+}
+
+if (!workerLoggedIn() && $router->getModule() !== 'module/account.php')
+{
+	setMessage('warn::Wymaganie zalogowanie się.');
+	
+	$_SESSION['locationUrl']['previous'] = $_SESSION['locationUrl']['this']; // zapakować w funkcję czy coś
+
+	$router->redirect('/account/login-form/redir');
+}
+
+$view = new View;
+
+$module = $router->getModule();
+$action = $router->getAction();
+$id = $router->getId();
+
 require($module);

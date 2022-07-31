@@ -1,5 +1,6 @@
 ﻿<?php
 
+$view->joinCSS('settings');
 
 if ($action == 'redir') {
 
@@ -18,7 +19,7 @@ $data = $settings->index();
 
 foreach ($data['workers'] as $key => $worker)
 {
-	if ($worker['is_disabled'])
+	if ($worker['disabled'])
 	{
 		$manage = 'Odblokuj';
 		$manageUrl = 'enable';
@@ -32,16 +33,36 @@ foreach ($data['workers'] as $key => $worker)
 	$data['workers'][$key]['manage'] = $manage;
 	$data['workers'][$key]['manageUrl'] = $manageUrl;
 
-	$data['workers'][$key]['status'] = $worker['is_activated'] ? 'Aktywne' : 'Nieaktywne';
+	$data['workers'][$key]['status'] = $worker['activated'] ? 'Aktywne' : 'Nieaktywne';
 }
 
 $view->addData($data);
 $view->addView('settings');
 
 $view->joinJS('settings');
-$view->render();
 
-exit;
+$trustedDeviceRequests = $db->run(
+	'SELECT wd.*, w.name AS workerName FROM workers_devices AS wd
+	JOIN workers AS w ON wd.worker_id = w.id
+	WHERE wd.deleted = 0 AND wd.status IS NULL
+	')->fetchAll();
+
+v($trustedDeviceRequests);
+
+// if (empty($trustedDeviceRequests))
+// {
+// 	setMessage('info::Brak urządzeń oczekujących na akceptacje.');
+// }
+
+$view->addData(['trustedDeviceRequests' => $trustedDeviceRequests]);
+
+$workerDevices = $db->run('SELECT * FROM workers_devices WHERE worker_id = :workerId AND status = "allow" AND deleted = 0', $workerId)->fetchAll();
+$view->addData(['workerDevices' => $workerDevices]);
+
+
+
+$view->render();
+exit; // render też robi exit;
 
 // $test = $_GET['test'];
 // echo $test .' :: ';

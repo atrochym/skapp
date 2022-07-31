@@ -1,45 +1,61 @@
-			<div class="content-box comment-box">
-				<h2 class="title">Notatki (<?= $commentsCount ?>)</h2>
-				<i class="ico-test fa fa-caret-up"></i>
-				<div class="animate">
-				<form action="/sk/device/<?= $receiveId ?>/add-comment" method="POST">
-
-				<div class="comment">
-					<!-- <input type="hidden" name="receive" value="<?= $receiveId ?>"> -->
-					<div class="c-worker">
-						<span class="avatar-user">AT</span>
-						<span class="worker-name">Andrzej Trochym</span>
-						<!-- Andrzej Trochym -->
-					</div>
-						<textarea name="comment" class="c-content input-box"></textarea>
-
-					<div class="button-box">
-						<!-- <select class="input select" name="action" size="1" >
-							<option>Dołącz akcję</option>
-							<option value="mark-done">Oznacz jako zakończone</option>
-							<option value="mark-cancel">Rezygnacja</option>
-						</select> -->
-						<button class="button-blue">Wyślij</button>
-					</div>
-				</div>
-				</form>
-
-				<?php foreach($comments as $comment): ?>
-					
-				<div class="comment">
-					<div class="c-worker">
-						<span class="avatar-user"><?= $comment['worker_short'] ?></span>
-						<span class="worker-name"><?= $comment['worker_name'] ?></span>
-					</div>
-					<div class="c-content"><?= $comment['content'] ?></div>
-					<div class="c-date"><?= $comment['create_datetime'] ?></div>
-					<div class="ico-box">
-						<i class="ico fa fa-edit"></i>
-						<a class="ico fa fa-trash" title="Usuń" href="/sk/device/<?= $receiveId ?>/remove-comment/comment-<?= $comment['id'] ?>"></a>
-					</div>
-				</div>
-
-				<?php endforeach; ?>
-
+<div class="content-box note-box">
+	<h2 class="title">Notatki (<?= count($notes) ?>)</h2>
+	<i class="ico-test fa fa-caret-up"></i>
+	<div class="animate">
+		<form class="note" id="note-create" action="/sk/note/create" method="post">
+			<input type="hidden" name="receive_id" value="<?= $receiveId ?>">
+			<input type="hidden" name="note_id" value="">
+			<div class="avatar-box">
+				<div class="avatar" style="background-image: url('https://media.creativemornings.com/uploads/user/avatar/246995/151103_Self_Portrait_50x50_72.jpg')"></div>
+			</div>
+			<div class="content-note">
+				<span class="author"><?= getFromSession('workerName') ?> &nbsp;•&nbsp; Pracownik</span>
+				<textarea class="content-input note-edit" name="note"></textarea>
+				<span class="error-message hidden"></span>
+			</div>
+			<div class="add-btn-box">
+				<button class="button-blue add-note-btn" type="submit">Dodaj notatkę</button>
+			</div>
+			<div class="edit-btn-box hidden">
+				<span class="date"></span>
+				<div class="icon-box">
+					<button class="ico star fa fa-star-o" title="Przypnij"></button>
+					<button class="button-blue update-btn hidden">Aktualizuj</button>
+					<button class="ico fa fa-edit note-edit-btn" type="button"></button>
+					<button class="ico fa fa-trash note-delete-btn" title="Usuń" type="button"></button>
+					<a class="button-blue delete-confirm-btn hidden" href="/sk/note/%id/delete">Potwierdź usunięcie</a>
+					<button class="ico fa fa-ban note-cancel-btn hidden" title="Anuluj" type="button"></button>
 				</div>
 			</div>
+		</form>
+
+		<?php foreach($notes as $note): ?>
+		<?php $pinned = $note['pinned'] ? 'pinned' : ''; ?>
+		<?php $star = $note['pinned'] ? 'fa-star' : 'fa-star-o'; ?>
+
+		<form class="note <?= $pinned ?>" action="/sk/note/edit" method="post">
+			<input type="hidden" name="note_id" value="<?= $note['id'] ?>">
+			<div class="avatar-box">
+				<div class="avatar"><?= $note['worker_short'] ?></div>
+			</div>
+			<div class="content-note">
+				<span class="author"><?= $note['worker_name'] ?> &nbsp;•&nbsp; Pracownik</span>
+				<textarea class="content-input note-read" name="note" disabled><?= $note['note'] ?></textarea>
+				<span class="error-message"></span>
+
+			</div>
+			<div>
+				<span class="date"><?= $note['created'] ?></span>
+				<div class="icon-box">
+					<button class="ico star fa <?= $star ?>" title="Przypnij"></button>
+					<button class="button-blue update-btn hidden">Aktualizuj</button>
+					<button class="ico fa fa-edit note-edit-btn" type="button"></button>
+					<button class="ico fa fa-trash note-delete-btn" title="Usuń" type="button"></button>
+					<a class="button-blue delete-confirm-btn hidden" href="/sk/note/<?= $note['id'] ?>/delete">Potwierdź usunięcie</a>
+					<button class="ico fa fa-ban note-cancel-btn hidden" title="Anuluj" type="button"></button>
+				</div>
+			</div>
+		</form>
+		<?php endforeach; ?>
+	</div>
+</div>

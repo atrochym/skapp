@@ -11,15 +11,34 @@ $allowDelete = true;
 	<form class="form-test" action="/sk/service/create" method="post" style="width: inherit;">
 		<input type="hidden" name="receiveId" value="<?= $receiveId ?>">
 
-		<table class="services-list" data-id="0" data-count="0">
+		<table class="solutions-list" data-id="0" data-count="0">
 			<tr>
-				<th class="col col1">Zaproponowane rozwiązanie</th>
-				<th class="col col2">Koszt</th>
-				<th class="col col3">Status</th>
-				<th class="col col4">Pracownik</th>
-				<th class="col col5">Akcje</th>
+				<th class="head-solution">Zaproponowane rozwiązanie</th>
+				<th class="head-price">Koszt</th>
+				<th class="head-status">Status</th>
+				<th class="head-worker">Pracownik</th>
+				<th class="head-buttons">Akcje</th>
 			</tr>
-
+			<!-- template hidden-->
+			<tr class="row hidden"> 
+				<td style="padding-left: 24px; position: relative;" >
+					<input class="input input-name input-edit" name="" value="" autocomplete="off">
+					<span class="char-count hidden">3</span>
+					<div class="prompt-box hidden">
+						<div class="template" tabindex="1">
+							<span class="name"></span>
+							<span class="price"></span> zł
+						</div>
+					</div>
+				</td>
+				<td class="">
+					<input class="input input-cost input-edit" name="" value="" autocomplete="off">
+				</td>
+				<td colspan="2"></td>
+				<td>
+					<a class="ico fa fa-trash solution-delete" title="Usuń"></a>
+				</td>
+			</tr>
 			<?php foreach ($services as $service): 
 				$priceTest = 'price';
 
@@ -68,8 +87,8 @@ $allowDelete = true;
 				natcasesort($workersList);
 			?>
 			<tr class="row" data-service_id="<?= $service['id'] ?>">
-				<td class="kek"><input disabled class="input-test dupa" type="text" value="<?= $service['name'] ?>"></td>
-				<td class=""><input disabled class="input-test-cost <?= $priceTest ?>" type="text" value="<?= $service['price'] ?>"></td>
+				<td style="padding-left: 24px" ><input class="input input-read" name="name" value="<?= $service['name'] ?>" disabled></td>
+				<td class=""><input class="input input-read input-cost <?= $priceTest ?>" name="price" value="<?= $service['price'] ?>" disabled></td>
 				<td class=""><?= $status ?></td>
 				<td class="">
 					<div class="worker-name-test"><?= $workerName ?></div>
@@ -86,35 +105,35 @@ $allowDelete = true;
 						if ($actionButtons) {
 
 							if ($service['status'] == 'finished') {
-								print '<a class="ico fa fa-check" title="Cofnij oznaczenie ukończenia" href="/sk/service/' . $service['id'] . '/incomplete"></a>';
+								print '<a class="ico fa fa-check" title="Cofnij oznaczenie ukończenia" href="/sk/service/'. $service['id'] .'/incomplete"></a>';
 
 							} elseif ($service['status'] == 'canceled') {
-								print '<a class="ico fa fa-frown-o" title="Cofnij rezygnację z naprawy" href="/sk/service/' . $service['id'] . '/restore"></a>';
+								print '<a class="ico fa fa-frown-o" title="Cofnij rezygnację z naprawy" href="/sk/service/'. $service['id'] .'/restore"></a>';
 
 							} elseif ($service['deleted']) {
-								print '<a class="ico fa fa-trash" title="Przywróć" href="/sk/service/' . $service['id'] . '/recover"></a>';
+								print '<a class="ico fa fa-trash" title="Przywróć" href="/sk/service/'. $service['id'] .'/recover"></a>';
 
 							} else {
-								print '<a class="ico fa fa-check" title="Oznacz jako ukończone" href="/sk/service/' . $service['id'] . '/complete"></a>';
+								print '<a class="ico fa fa-check" title="Oznacz jako ukończone" href="/sk/service/'. $service['id'] . '/complete"></a>';
 
 								if ($service['part_id']) {
-									print '<a class="ico fa fa-plug" title="Odłącz część" href="/sk/service/'.$service['id'].'/unplug-part/"></a>';
+									print '<a class="ico fa fa-plug" title="Odłącz część" href="/sk/service/'. $service['id'] .'/unplug-part/"></a>';
 								} else {
-									print '<a class="ico fa fa-wrench" title="Przypisz część" href="#" onclick="assignPart('.$service['id'].');"></a>';
+									print '<a class="ico fa fa-wrench" title="Przypisz część" href="#" onclick="assignPart('. $service['id'] .');"></a>';
 
 								}
 								
 
-								print '<a class="ico fa fa-frown-o" title="Rezygnacja z tej naprawy" href="/sk/service/' . $service['id'] . '/cancel"></a>';
+								print '<a class="ico fa fa-frown-o" title="Rezygnacja z tej naprawy" href="/sk/service/'. $service['id'] .'/cancel"></a>';
 
 
 								if ($allowEdit) {
-									print '<a class="ico fa fa-edit row-edit" title="Edytuj"></a>';
+									print '<a class="ico fa fa-edit solution-edit" title="Edytuj"></a>';
 
 								}
 
 								if ($allowDelete) {
-									print '<a class="ico fa fa-trash" title="Usuń" href="/sk/service/' . $service['id'] . '/delete"></a>';
+									print '<a class="ico fa fa-trash" title="Usuń" href="/sk/service/'. $service['id'] .'/delete"></a>';
 								}
 
 								if ($allowChangeWorker) {
@@ -127,19 +146,22 @@ $allowDelete = true;
 						}
 					?>
 					</div>
-					<div class="edit-buttons" style="display:none;">
-						<a class="ico fa fa-save row-edit-end" title="Aktualizuj" onclick="testsubmit(<?= $service['id'] ?>);"></a>
-						<a class="ico fa fa-times row-edit-end" title="Anuluj"></a>
+					<div class="edit-buttons hidden">
+						<a class="ico fa fa-save solution-update-btn" title="Aktualizuj"></a>
+						<a class="ico fa fa-times solution-edit-end" title="Anuluj"></a>
 					</div>
 				</td>
 			</tr>
 			<?php endforeach; ?>
 			<!-- </tr> -->
 			<tr class="buttons" style="line-height: 28px;">
-				<td class="kek" style="text-align: right; padding-right: 10px;">RAZEM</td>
-				<td class="price-total" style="padding-left: 8px;">340 PLN</td>
+				<td class="kek" style="text-align: right; padding-right: 10px;">
+					<button class="button add-solution" style="position: absolute; left:27px; bottom: 13px; top:auto; width:80px;" type="button">Dodaj</button>
+					<button class="button solution-save-btn hidden" style="position: absolute; left:118px; bottom: 13px; top:auto; width:80px;" type="button">Zapisz</button>
+					<span>RAZEM</span>
+				</td>
+				<td class="price-total" style="padding-left: 8px;">0 PLN</td>
 			</tr>
-			<button class="button add-solution" style="position: absolute; left:27px; bottom: 27px; top:auto; width:80px;" type="button">Dodaj</button>
 		</table>
 	</form>
 </div>

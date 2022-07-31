@@ -62,12 +62,11 @@ class ServicesList
 	{
 		if (empty($this->servicesList))
 		{
-			$data = ['receive_id' => $this->receiveId];
 			$exec = $this->db->run(
 				'SELECT s.*, p.id AS part_id, p.name AS part_name, p.assigned
 				FROM services AS s
 				LEFT JOIN parts AS p ON s.part_id = p.id
-				WHERE receive_id = :receive_id', $data);
+				WHERE receive_id = :receive_id', $this->receiveId);
 
 			$this->servicesList = $exec->fetchAll();
 		}

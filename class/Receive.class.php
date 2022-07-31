@@ -20,10 +20,7 @@ class Receive
 
 	public function open()
 	{
-		if (!$this->getData())
-		{
-			return;
-		}
+		if(!$this->exist()) return false;
 
 		if ($this->receive['deleted'])
 		{
@@ -46,10 +43,7 @@ class Receive
 
 	public function complete()
 	{
-		if (!$this->getData())
-		{
-			return;
-		}
+		if(!$this->exist()) return false;
 
 		if ('finished' == $this->receive['status'])
 		{
@@ -78,10 +72,7 @@ class Receive
 
 	public function start()
 	{
-		if (!$this->getData())
-		{
-			return;
-		}
+		if(!$this->exist()) return false;
 
 		if ($this->receive['deleted'])
 		{
@@ -110,10 +101,7 @@ class Receive
 
 	public function restore()
 	{
-		if (!$this->getData())
-		{
-			return;
-		}
+		if(!$this->exist()) return false;
 
 		if ('started' == $this->receive['status'])
 		{
@@ -130,10 +118,7 @@ class Receive
 
 	public function recover()
 	{
-		if (!$this->getData())
-		{
-			return;
-		}
+		if(!$this->exist()) return false;
 
 		$values = ['receiveId' => $this->receiveId];
 		$this->db->run('UPDATE receives SET deleted = 0 WHERE id = :receiveId', $values);
@@ -144,10 +129,7 @@ class Receive
 
 	public function delete()
 	{
-		if (!$this->getData() || $this->isLocked())
-		{
-			return;
-		}
+		if(!$this->exist()) return false;
 
 		$values = ['receiveId' => $this->receiveId];
 		$this->db->run('UPDATE receives SET deleted = 1 WHERE id = :receiveId', $values);
@@ -245,52 +227,40 @@ class Receive
 		return $deviceTag . date('my');
 	}
 
+	public function get(string $field = null)
+	{
+		if(!$this->exist()) return false;
 
-	// private function getReceiveData()
-	// {
-	// 	if (empty($this->receive))
-	// 	{
-	// 		$values = ['id' => $this->receiveId];
-	// 		$exec = $this->db->run(
-	// 			'SELECT r.id AS receive_id, r.*, d.customer_id, d.producer, d.model, c.telephone
-	// 			FROM receives AS r 
-	// 			LEFT JOIN devices AS d ON r.device_id = d.id 
-	// 			LEFT JOIN customers AS c ON d.customer_id = c.id 
-	// 			WHERE r.id = :id', $data)->fetch();
+		if (!isset($this->receive[$field]))
+		{
+			$this->message = 'warn::Pole nie istnieje.';
+			return false;
+		}
+		return $this->receive[$field];
+	}
 
-	// 		if (!$exec)
-	// 		{
-	// 			// throw new Exception('Receive :: record not exist');
-	// 			$this->message = 'error::Przyjęcie o podanym identyfikatorze nie istnieje.';
-	// 			return false;
-	// 		}
-
-	// 		$this->receive = $exec;
-	// 	}
-
-	// 	return $this->receive;
-	// }
+	public function exist()
+	{
+		if (!$this->getData())
+		{
+			return false;
+		}
+		return true;
+	}
 
 	public function getData()
 	{
-		if ((int) $this->receiveId < 1)
-		{
-			$this->message = 'warn::Niepoprawny identyfikator klienta.';
-			return false;
-		}
-
 		if ($this->receive)
 		{
 			return $this->receive;
 		}
 
-		$values = ['receiveId' => $this->receiveId];
 		$receive = $this->db->run(
 			'SELECT r.id AS receive_id, r.*, d.customer_id, d.producer, d.model, c.phone
 			FROM receives AS r 
 			LEFT JOIN devices AS d ON r.device_id = d.id 
 			LEFT JOIN customers AS c ON d.customer_id = c.id 
-			WHERE r.id = :receiveId', $values)->fetch();
+			WHERE r.id = :receiveId', $this->receiveId)->fetch();
 
 		if (!$receive)
 		{

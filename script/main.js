@@ -125,3 +125,61 @@ function copyInput() {
 	$("#copy-button").focus();
 }
 
+function toggleVisible(element) {
+	element.classList.toggle('hidden');
+}
+
+async function fetchData(url, data, method = 'POST') {
+	try {
+		if (!url || !data) {
+			throw 'url or data missing';
+		}
+
+		headers = {
+			'Content-Type': 'application/json'
+		}
+
+		const response = await fetch(url, {
+			method: method,
+			headers: headers,
+			body: JSON.stringify(data)
+		});
+
+		if (!response.ok) {
+			throw 'connection error';
+		}
+
+		return await response.json();
+
+	} catch (error) {
+		console.log('fetchData error :: ' + error);
+		return {
+			'success': false,
+			'message': 'Wystąpił błąd przetwarzania żądania.'
+		};
+	}
+}
+
+function prettyMessage(message) {
+	if (message.indexOf('::') > -1) {
+		return message.substring(message.indexOf('::') + 2);
+	}
+	return message
+}
+
+function showMessageBox(message) {
+
+	let messageDOM = document.querySelector('.message');
+	let separator = message.indexOf('::');
+
+	if (!separator)
+	{
+		console.log('showMessageBox :: wrong message format');
+		return;
+	}
+	let messageType = message.slice(0, separator);
+	let messageContent = message.slice(separator + 2);
+
+	messageDOM.textContent = messageContent;
+	messageDOM.className = `message message-${messageType}`;
+}

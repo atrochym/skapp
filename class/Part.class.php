@@ -14,7 +14,7 @@ class Part
 	{
 		$this->db->beginTransaction();
 
-		$lastGroupId = $this->db->run('SELECT group_id FROM parts ORDER BY id DESC LIMIT 1', [])->fetchColumn();
+		$lastGroupId = $this->db->run('SELECT group_id FROM parts ORDER BY id DESC LIMIT 1')->fetchColumn();
 		$lastGroupId++;
 		
 		foreach ($data['item'] as $item)
@@ -74,7 +74,7 @@ class Part
 
 	public function getAllCategories()
 	{
-		$categories = $this->db->run('SELECT id, name FROM parts_categories WHERE deleted = 0', [])->fetchAll();
+		$categories = $this->db->run('SELECT id, name FROM parts_categories WHERE deleted = 0')->fetchAll();
 
 		if (!$categories)
 		{

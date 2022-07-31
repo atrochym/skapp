@@ -1,7 +1,25 @@
 Options FollowSymLinks
 RewriteEngine On
+RewriteBase /sk/
 
+<Files *.php>
+	Order Deny,Allow
+#	Deny from all
+	Allow from 192.168.0.1
+</Files>
+<Files index.php>
+	Order Allow,Deny
+	Allow from all
+</Files>
+
+RewriteCond %{HTTP_REFERER} !^$
+# RewriteCond %{HTTP_REFERER} !^http:\/\/(www\.)atdev.ddns.net/.*$ [NC]
+RewriteCond %{HTTP_REFERER} !^.*atdev.ddns.net.*$ [NC]
+RewriteRule \.(jpg|jpeg|png)$ - [F]
+
+# RewriteCond %{REQUEST_URI} \.(css|map|js|woff2)$
+# RewriteRule (.*)/(css|script|img)\/.* $1 [L]
 
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule (.*)	index.php/$1 [L]
+# RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule (.*) index.php/$0 [L]

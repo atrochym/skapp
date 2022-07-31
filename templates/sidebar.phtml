@@ -1,10 +1,10 @@
 			<div class="sidebar">
-				<a class="sidebar-icon-box" href="<?= DIR ?>desktop/">
+				<a class="sidebar-icon-box" href="<?=DIR?>/dashboard/">
 					<i class="fa fa-desktop"></i>
 					<span class="sidebar-text">Pulpit</span>
 				</a>
 				<?php if (workerPermit('device_receive')): ?>
-					<a class="sidebar-icon-box" href="<?= DIR ?>customer/register">
+					<a class="sidebar-icon-box" href="<?=DIR?>/customer/register">
 						<i class="fa fa-arrow-down"></i>
 						<span class="sidebar-text">Przyjęcie</span>
 					</a>
@@ -19,17 +19,17 @@
 						<i class="fa fa-hourglass-half"></i>
 						<span class="sidebar-text">Kolejka</span>
 					</a>
-					<a class="sidebar-icon-box" href="<?= DIR ?>list">
+					<a class="sidebar-icon-box" href="<?=DIR?>/list">
 						<i class="fa fa-database"></i>
 						<span class="sidebar-text">Przegląd</span>
 					</a>
 				<?php if (workerPermit('stock_manager')): ?>
-					<a class="sidebar-icon-box" href="<?= DIR ?>part/create-order">
+					<a class="sidebar-icon-box" href="<?=DIR?>/part/create-order">
 						<i class="fa fa-database"></i>
 						<span class="sidebar-text">Magazyn</span>
 					</a>
 				<?php endif; ?>
-					<a class="sidebar-icon-box" href="<?= DIR ?>customer/list">
+					<a class="sidebar-icon-box" href="<?=DIR?>/customer/list">
 						<i class="fa fa-database"></i>
 						<span class="sidebar-text">Klienci</span>
 					</a>

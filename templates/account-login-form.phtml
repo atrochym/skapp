@@ -3,8 +3,8 @@
 
 <head>
 	<title>Studio-Komp - logowanie</title>
-	<link rel="stylesheet" href="<?= DIR ?>css/main.css">
-	<link rel="stylesheet" href="<?= DIR ?>css/font-awesome.min.css">
+	<link rel="stylesheet" href="<?=DIR?>/css/main.css">
+	<link rel="stylesheet" href="<?=DIR?>/css/font-awesome.min.css">
 
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,7 +21,7 @@
 		<form method="post" action="/sk/account/login">
 			<div style="margin-bottom: 15px; display:flex; justify-content: center; ">
 				<span class="x" style="display:inline-block; color:#F0F0F0;">Login:</span>
-				<input type="text" class="input-new" style="display:inline-block; width: 250px" name="worker_login" value="<?= formBackup('worker_login') ?>">
+				<input type="text" class="input-new" style="display:inline-block; width: 250px" name="worker_login" value="<?= formBackup('worker_login') ?>" autofocus>
 			</div>
 			<div style="margin-bottom: 15px; display:flex; justify-content: center; ">
 

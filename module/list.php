@@ -1,16 +1,12 @@
 <?php
 
-if ($action == 'redir') {
+// ogarnąć sensownie zestawianie takich danych
 
+$list = new ListReceives($db);
+$listReceives = $list->allReceives();
 
-} else {
+$view->joinCSS('list');
+$view->addData($listReceives);
+$view->addView('list-index');
 
-	$listModel = new ListModel($model);
-	$listView = new ListView($view);
-
-	$data = $listModel->listIndex();
-	v($data['receives']);
-	$listView->listIndex($data);
-	$view->render();
-
-}
+$view->render();

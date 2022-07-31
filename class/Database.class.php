@@ -32,15 +32,27 @@ class Database extends PDO
 		}
 	}
 
-	public function run(string $query, array $data): mixed
+	public function run(string $query, string|array $data = null): mixed
 	{
 		try
 		{
+			// if (!$data && substr_count($query, ':') || !is_array($data) && substr_count($query, ':') > 1)
+			// {
+			// 	throw new PDOException('missing value for placeholder');
+			// }
+
 			$exec = parent::prepare($query);
 
-			foreach ($data as $key => $value)
+			if (is_array($data))
 			{
-				$exec->bindValue($key, $value);
+				foreach ($data as $key => $value)
+				{
+					$exec->bindValue($key, $value);
+				}
+			}
+			elseif($data)
+			{
+				$exec->bindValue(1, $data);
 			}
 			
 			$exec->execute();
@@ -80,7 +92,7 @@ class Database extends PDO
 		try
 		{
 			$columns = implode(', ', array_keys($data));
-			$placeholders = ':'.implode(', :', array_keys($data));	
+			$placeholders = ':'.implode(', :', array_keys($data));
 			$exec = parent::prepare("INSERT INTO $table ($columns) VALUES ($placeholders)");
 			$exec->execute($data);
 

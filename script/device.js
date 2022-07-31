@@ -81,127 +81,94 @@ $(".ico-test").click(function() {
 });
 
 
-function delrow(element) {
-	var solutionsTable = $(".solution-list");
+// function delrow(element) {
+// 	var solutionsTable = $(".solution-list");
 
-	$(element).parents('.row').remove();
-	solutionsTable.data('count', --count);
-	if(count == 0) {
-		$(".save-solution").remove();
-	}
-	newPrice();
+// 	$(element).parents('.row').remove();
+// 	solutionsTable.data('count', --count);
+// 	if(count == 0) {
+// 		$(".save-solution").remove();
+// 	}
+// 	newPrice();
 
-}
+// }
 
-$(".add-solution").click(function() {
 
-	var solutionsTable = $(".services-list");
 
-	numberOfSolutions = parseInt(solutionsTable.data('id'));
-	count = parseInt(solutionsTable.data('count'));
-
-	var newRow = `	<tr class="row">
-						<td class="kek">
-							<input class="add-row input-test" type="text" name="solution[${numberOfSolutions}][name]" value="">
-						</td>
-						<td>
-							<input class="add-row input-test-cost price" type="text" name="solution[${numberOfSolutions}][price]" value="">
-						</td>
-						<td colspan="2"></td>
-						<td>
-							<a class="ico fa fa-trash delete-row" title="Usuń" onclick="delrow(this)"></a>
-						</td>
-					</tr>
-					
-					`;
-
-	var saveButton = `<button class="button save-solution" style="position: absolute; left:108px; bottom: 27px; top:auto; width:80px;" type="submit">Zapisz</button>`;
-
-	solutionsTable.data('id', ++numberOfSolutions);
-	solutionsTable.data('count', ++count);
-
-	$(".buttons").before(newRow);
-	if(count == 1) {
-		$(".add-solution").before(saveButton);
-	}
-	createListeners();
-
-});
-
-function newPrice() {
-	let priceMin = 0;
-	let priceMax = 0;
-	$("input.price").each(function() {
-		thisPrice = $(this).val();
-		if(thisPrice.indexOf("-") != -1) {
-			period = thisPrice.split("-").sort();
-			periodMin = parseInt(period[0]);
-			periodMax = parseInt(period[1]);
-			thisPrice = 0;
-		} else {
-			thisPrice = parseInt(thisPrice);
-			periodMin = 0;
-			periodMax = 0;
-			if(Number.isNaN(thisPrice)) {
-				thisPrice = 0;
-			}
-		}
-		priceMin = priceMin + thisPrice + periodMin;
-		priceMax = priceMax + thisPrice + periodMax;
-	});
-	// ogarnij if w 1 linii
-	if(priceMin !== priceMax) {
-		priceMin = priceMin + ' - ' + priceMax;
-	} 
+// function newPrice() {
+// 	let priceMin = 0;
+// 	let priceMax = 0;
+// 	$("input.price").each(function() {
+// 		thisPrice = $(this).val();
+// 		if(thisPrice.indexOf("-") != -1) {
+// 			period = thisPrice.split("-").sort();
+// 			periodMin = parseInt(period[0]);
+// 			periodMax = parseInt(period[1]);
+// 			thisPrice = 0;
+// 		} else {
+// 			thisPrice = parseInt(thisPrice);
+// 			periodMin = 0;
+// 			periodMax = 0;
+// 			if(Number.isNaN(thisPrice)) {
+// 				thisPrice = 0;
+// 			}
+// 		}
+// 		priceMin = priceMin + thisPrice + periodMin;
+// 		priceMax = priceMax + thisPrice + periodMax;
+// 	});
+// 	// ogarnij if w 1 linii
+// 	if(priceMin !== priceMax) {
+// 		priceMin = priceMin + ' - ' + priceMax;
+// 	} 
 	
-	$(".price-total").text(priceMin + ' PLN');
-}
+// 	$(".price-total").text(priceMin + ' PLN');
+// }
 
-function createListeners() {
-	$(`.price`).change(function() {
-		newPrice();
-	});
-}
+// function createListeners() {
+// 	$(`.price`).change(function() {
+// 		newPrice();
+// 	});
+// }
 
-newPrice();
-createListeners();
+// newPrice();
+// createListeners();
 
 
 
-$(".row-edit").click(function() {
+// $(".row-edit").click(function() {
 
-	var row = $(this).parents('.row');
+// 	var row = $(this).parents('.row');
 	
 
-	input = row.find("input");
+// 	input = row.find("input");
 
-	nameValue = input.eq(0).val();
-	priceValue = input.eq(1).val();
+// 	nameValue = input.eq(0).val();
+// 	priceValue = input.eq(1).val();
 
-	input.addClass("add-row");
-	input.removeAttr("disabled");
-	input.eq(0).attr("name", "name");
-	input.eq(1).attr("name", "price");
-	row.find(".action-buttons").toggle();
-	row.find(".edit-buttons").toggle();
+// 	input.addClass("input-edit");
+// 	input.removeAttr("disabled");
+// 	input.eq(0).attr("name", "name");
+// 	input.eq(1).attr("name", "price");
+// 	row.find(".action-buttons").toggle();
+// 	row.find(".edit-buttons").toggle();
 
-});
+// });
 
-$(".row-edit-end").click(function() {
+// $(".row-edit-end").click(function() {
 
-	var row = $(this).parents('.row');
+// 	var row = $(this).parents('.row');
 	
-	input = row.find("input");
-	input.eq(0).val(nameValue);
-	input.eq(1).val(priceValue);
-	input.removeClass("add-row");
-	input.attr("disabled", true);
-	row.find(".action-buttons").toggle();
-	row.find(".edit-buttons").toggle();
+// 	input = row.find("input");
+// 	input.eq(0).val(nameValue);
+// 	input.eq(1).val(priceValue);
+// 	input.removeClass("input-edit");
+// 	input.attr("disabled", true);
+// 	row.find(".action-buttons").toggle();
+// 	row.find(".edit-buttons").toggle();
 
-	newPrice();
+// 	newPrice();
 
-});
+// });
 
 function testsubmit(id) {
 	var form = $(".form-test");
@@ -213,10 +180,10 @@ function testsubmit(id) {
 	form.submit();
 }
 
-function delegateService () {
+// function delegateService () {
 
 
-}
+// }
 
 $(".change-worker-button").click(function() {
 
@@ -250,16 +217,12 @@ $(".change-worker-button").click(function() {
 });
 
 // set prediction date to next work day
-function setPredictionDate()
-{
-	let date = new Date;
+function setPredictionDate() {
+	const date = new Date;
 
-	if (date.getDay() >= 5)
-	{
+	if (date.getDay() >= 5) {
 		date.setUTCDate(date.getDate() + 3);
-	}
-	else
-	{
+	} else {
 		date.setUTCDate(date.getDate() + 1);
 	}
 
@@ -267,9 +230,9 @@ function setPredictionDate()
 }
 
 document.querySelector('.prediction-date').value = setPredictionDate();
-document.querySelector('.prediction-date').addEventListener('change', (e) => {
-	let selectedDate = e.target.value.split('-');
-	let date = new Date;
+document.querySelector('.prediction-date').addEventListener('change', e => {
+	const selectedDate = e.target.value.split('-');
+	const date = new Date;
 
 	date.setFullYear();
 

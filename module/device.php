@@ -1,10 +1,10 @@
 <?php
 
-$deviceId = $controller->id();
+$deviceId = $router->getId();
 
 if ($action == 'receive-form') {
 	if (!$deviceId) {
-		$controller->redirect('desktop');
+		$router->redirect('/desktop');
 	}
 
 	$customer = new CustomerModel($model);
@@ -12,7 +12,7 @@ if ($action == 'receive-form') {
 
 	if (!$result['success']) {
 		$model->message->set($result);
-		$controller->redirect('back');
+		$router->redirect('back');
 	}
 
 	$customerView = new CustomerView($view);
@@ -35,7 +35,7 @@ if ($action == 'receive-form') {
 	$deviceModel = new DeviceModel($model);
 	$result = $deviceModel->delete($deviceId);
 	$model->message->set($result);
-	$controller->redirect('back');
+	$router->redirect('back');
 
 }
 elseif ($action == 'create') //zostaje   /////////////////// jak zrobić ze sprawdzaniem uprawnień?
@@ -43,7 +43,7 @@ elseif ($action == 'create') //zostaje   /////////////////// jak zrobić ze spra
 	// if (!workerPermit('device_create'))
 	// {
 	// 	setMessage('warn::Do wykonania tej akcji potrzebujesz uprawnień.');
-	// 	$controller->redirect('back');
+	// 	$router->redirect('back');
 	// }
 
 
@@ -53,17 +53,17 @@ elseif ($action == 'create') //zostaje   /////////////////// jak zrobić ze spra
 	$validate->add('model', $_POST['model'], 'text 0 50');
 	$validate->add('serialNumber', $_POST['serial_number'], 'text 0 50');
 
-	if (!$validate->getValid())
+	if (!$validate->check())
 	{
 		setMessage('error::Wystąpił błąd podczas walidacji danych.');
-		$controller->redirect('back');
+		$router->redirect('back');
 	}
 
 	$device = new Device($db);
 	$result = $device->create($validate->getValidData());
 
 	setMessage($device->message);
-	$controller->redirect('device/' . $result . '/receive');
+	$router->redirect('/device/' . $result . '/receive');
 }
 
 $device = new Device($db);

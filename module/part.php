@@ -1,6 +1,6 @@
 <?php
 
-$partId = $controller->id();
+$partId = $router->getId();
 // $partModel = new PartModel($model, $partId);
 
 if ($action == 'create-order')
@@ -23,10 +23,10 @@ elseif ($action == 'save-order')
 	$validate->add('seller', $_POST['seller'], 'text require 3 50');
 	$validate->add('deliveryCost', $_POST['delivery-cost'], 'float 3 6');
 
-	if (!$validate->getValid())
+	if (!$validate->check())
 	{
 		setMessage('error::Wystąpił błąd podczas walidacji danych.');
-		$controller->redirect('back');
+		$router->redirect('back');
 	}
 
 	$validData = $validate->getValidData();
@@ -42,10 +42,10 @@ elseif ($action == 'save-order')
 		$isPartUsed = isset($item['cb-is_used']) ? 1 : 0;
 
 
-		if (!$validate->getValid())
+		if (!$validate->check())
 		{
 			setMessage('error::Wystąpił błąd podczas walidacji danych.');
-			$controller->redirect('back');
+			$router->redirect('back');
 		}
 
 		$validData['item'][$key]['category'] = $validate->category;
@@ -71,7 +71,7 @@ elseif ($action == 'save-order')
 	// }
 	
 	setMessage($part->message);
-	$controller->redirect('back');
+	$router->redirect('back');
 }
 elseif ($action == 'create-category')
 {
@@ -80,7 +80,7 @@ elseif ($action == 'create-category')
 	$validate = new Validate;
 	$validate->add('name', $input['category'], 'require text 3 50');
 
-	if (!$validate->getValid())
+	if (!$validate->check())
 	{
 		$response['categoryId'] = null;
 		$response['message'] = 'warn::Nazwa kategorii ma niepoprawny format lub długość.';

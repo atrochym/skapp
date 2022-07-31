@@ -264,11 +264,10 @@ class Service
 			return $this->service;
 		}
 
-		$values = ['serviceId' => $this->serviceId];
 		$service = $this->db->run(
 			'SELECT s.*, r.status AS receive_status, r.deleted AS receive_deleted FROM services AS s
 			LEFT JOIN receives AS r ON s.receive_id = r.id
-			WHERE s.id = :serviceId', $values)->fetch();
+			WHERE s.id = :serviceId', $this->serviceId)->fetch();
 
 		if (!$service)
 		{

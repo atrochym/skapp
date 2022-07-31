@@ -1,6 +1,6 @@
 <?php
 
-$serviceId = $controller->id();
+$serviceId = $router->getId();
 
 $service = new Service($db);
 $service->setServiceId($serviceId);
@@ -11,7 +11,7 @@ if ($action == 'assign-part')
 	formBackup();
 
 	if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['assign-mode'])) {
-		$controller->redirect('back');
+		$router->redirect('back');
 	}
 
 	if ($_POST['assign-mode'] == 'create-part') {
@@ -56,13 +56,16 @@ elseif ($action == 'incomplete')
 }
 elseif ($action == 'create')
 {
+	ve($_POST);
+
+	
 	$validate = new Validate;
 	$validate->add('receiveId', $_POST['receiveId'], 'require integer');
 
-	if(!$validate->getValid())
+	if(!$validate->check())
 	{
 		setMessage('error::Błąd przesyłania danych formularza.');
-		$controller->redirect('back');
+		$router->redirect('back');
 	}
 
 	$validData = $validate->getValidData();
@@ -72,10 +75,10 @@ elseif ($action == 'create')
 		$validate->add('name', $value['name'], 'require text 3 100');
 		$validate->add('price', $value['price'], 'require interval 1 9');
 
-		if (!$validate->getValid())
+		if (!$validate->check())
 		{
 			setMessage('error::Wystąpił błąd podczas walidacji danych.');
-			$controller->redirect('back');
+			$router->redirect('back');
 		}
 
 		$validData['solution'][$key]['name'] = $validate->name;
@@ -86,23 +89,33 @@ elseif ($action == 'create')
 	$service->create($validData);
 
 	setMessage($service->message);
-	$controller->redirect('back');
+	$router->redirect('back');
 
 }
 elseif ($action == 'update')
 {
-	$validate = new Validate;
-	$validate->add('name', $_POST['name'], 'text require 3 100');
-	$validate->add('price', $_POST['price'], 'interval require 1-9');
-	$validate->add('receiveId', $_POST['receiveId'], 'require integer');
+	$input = $router->requestJson();
 
-	if(!$validate->getValid())
+	$validate = new Validate;
+	$validate->add('name', $input['name'], 'text require 3 100');
+	$validate->add('price', $input['price'], 'interval require 1-9');
+	$validate->add('serviceId', $input['serviceId'], 'require integer');
+
+	$response['success'] = false;
+
+	if (!$validate->check())
 	{
-		setMessage('error::Błąd przesyłania danych formularza.');
-		$controller->redirect('back');
+		$response['message'] = 'warn::Wystąpił błąd walidacji danych.';
+	}
+	else
+	{
+		$service = new Service($db);
+		$service->setServiceId($validate->serviceId);
+		$response['success'] = $service->update($validate->getValidData());
 	}
 
-	$service->update($validate->getValidData());
+	echo json_encode($response);
+	exit;
 }
 elseif ($action == 'set-worker')
 {
@@ -110,16 +123,47 @@ elseif ($action == 'set-worker')
 	$validate->add('workerId', $_POST['worker_id'], 'require integer');
 	$validate->add('serviceId', $_POST['service_id'], 'require integer');
 
-	if (!$validate->getValid())
+	if (!$validate->check())
 	{
 		setMessage('error::Błąd przesyłania danych formularza.');
-		$controller->redirect('back');
+		$router->redirect('back');
 	}
 
 	$service->setServiceId($validate->serviceId);
 	$service->setWorker($validate->workerId);
 }
+elseif ($action == 'test')
+{
+	$input = $router->requestJson();
 
+	$validate = new Validate;
+	$validate->add('name', $input['name'], 'text require 3 100');
+	// $validate->add('price', $input['price'], 'interval require 1-9');
+	// $validate->add('serviceId', $input['serviceId'], 'require integer');
+
+	$response['success'] = false;
+
+	if (!$validate->check())
+	{
+		$response['message'] = 'warn::Wystąpił błąd walidacji danych.';
+	}
+	else
+	{
+		// $service = new Service($db);
+		// $service->setServiceId($validate->serviceId);
+		// $response['success'] = $service->update($validate->getValidData());
+
+		$values = [
+			'name' => '%'.$validate->name.'%',
+		];
+		$response['data'] = $db->run('SELECT * FROM services_names WHERE name LIKE :name', $values)->fetchAll();
+		$response['success'] = true;
+
+	}
+
+	echo json_encode($response);
+	exit;
+}
 // $model->message->set($result);
 setMessage($service->message);
-$controller->redirect('back');
+$router->redirect('back');

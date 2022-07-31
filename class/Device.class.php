@@ -43,11 +43,10 @@ class Device
 			return $this->device;
 		}
 
-		$data = ['deviceId' => $this->deviceId];
 		$device = $this->db->run(
 			'SELECT d.id AS device_id, c.id AS customer_id, d.*, c.* FROM devices AS d
 			LEFT JOIN customers AS c ON d.customer_id = c.id
-			WHERE d.id = :deviceId', $data)->fetch();
+			WHERE d.id = :deviceId', $this->deviceId)->fetch();
 
 		if (!$device)
 		{

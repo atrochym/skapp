@@ -1,0 +1,121 @@
+@use 'main' as m
+
+$labelGray: #B2B2B2
+$inputColor: #41505C
+$borderColor: #546776
+
+
+	
+.field
+	width: 260px
+
+	&-first 
+		width: 260px
+		margin-left: 28px
+	
+
+	&-last 
+		width: 220px
+
+.label
+	display: inline-block
+	vertical-align: text-top
+	font-size: 14px
+	&-small
+		@extend .label
+		font-size: 12px
+	
+	&-gray-small 
+		@extend .label
+		color: $labelGray
+		font-size: 12px	
+
+	&-gray
+		@extend .label
+		color: $labelGray
+
+
+
+.input 
+	display: block
+	margin-left: 5px
+	margin-top: 14px
+	width: 220px
+	border-radius: 4px
+	border: $borderColor 1px solid
+	background-color: $inputColor
+	padding: 4px
+
+.tooltip
+	color: #5e7081
+	margin-left: 10px
+	font-size: 17px
+	line-height: 0
+
+.checkbox-custom
+	cursor: pointer
+	user-select: none
+	margin-right: 10px
+	vertical-align: middle
+	display: inline-block
+	
+	input
+		display: none
+	
+	/* Create a custom checkbox */
+	.checkbox 
+		display: block
+		width: 25px
+		height: 24px
+		background-color: $inputColor
+		border-radius: 4px
+		border: solid 1px $borderColor
+		padding: 3px 8px
+
+	/* Create the checkmark/indicator (hidden when not checked) */
+	.checkbox:after 
+		content: ""
+		display: none
+
+	/* On mouse-over, add a grey background color */
+	&:hover input ~ .checkbox 
+		border-color: #66AFE9
+		box-shadow: inset 0px 1px 1px rgba(0,0,0,0.075), 0px 0px 8px rgba(102,175,233,0.70)
+
+	/* Show the checkmark when checked */
+	input:checked ~ .checkbox:after 
+		display: block
+	
+	/* Style the checkmark/indicator */
+	.checkbox:after 
+		width: 8px
+		height: 14px
+		border: solid
+		border-width: 0 3px 3px 0
+		transform: rotate(35deg)
+
+.customer-language
+	@extend .checkbox-custom
+	display: block
+	margin: 14px 0 0 5px
+
+.buttons-box
+	display: flex
+	justify-content: flex-end
+	// margin-top: 30px
+	margin-top: 20px
+	padding: 0 15px 0 0
+
+
+	.select
+		width: 184px
+		height: 26px
+		padding-top: 2px
+		margin: 0 45px 0 15px
+
+	.save
+		margin-left: 10px
+	
+	.cancel
+		margin: 0 10px 0 15px
+// powyższe CSS mogą być zduplikowane

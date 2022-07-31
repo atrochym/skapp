@@ -2,6 +2,7 @@
 
 $issue = $issue ?: '---';
 $showPassword = !$password ? 'hidden' : '';
+$urlMask = url('/receive/'.$receiveId);
 
 ?>
 
@@ -16,9 +17,9 @@ $showPassword = !$password ? 'hidden' : '';
 <div class="top-menu">
 	<?php 
 		if ($finished) : ?>
-		Zamknięte <a href="/sk/receive/<?= $receiveId ?>/open">(Otwórz)</a>
+		Zamknięte <a href="<?=DIR . $urlMask?>/open">(Otwórz)</a>
 		<?php elseif ($deleted): ?>
-		Usunięte <a href="/sk/receive/<?= $receiveId ?>/recover">(Przywróć)</a>
+		Usunięte <a href="<?=DIR . $urlMask?>/recover">(Przywróć)</a>
 		<?php elseif ($returned): ?>
 		Wydane
 		<?php else: ?>
@@ -26,10 +27,10 @@ $showPassword = !$password ? 'hidden' : '';
 		<div>
 			<?php
 				if ($delegateReceive) {
-					print '<a class="button-m" href="/sk/device/'. $receiveId .'/delegate">
+					print '<a class="button-m" href="'. DIR . $urlMask .'/delegate">
 							<i class="ico fa fa-check"></i>Oddeleguj</a>';
 				} else {
-					print '<a class="button-m" href="/sk/receive/'. $receiveId .'/complete">
+					print '<a class="button-m" href="'. DIR . $urlMask .'/complete">
 					<i class="ico fa fa-check"></i>Zgłoś jako ukończony</a>';
 				}
 			?>
@@ -39,7 +40,7 @@ $showPassword = !$password ? 'hidden' : '';
 				<i class="ico fa fa-frown-o"></i>Rezygnacja</a>
 			<a class="button-m" href="#">
 				<i class="ico fa fa-edit"></i>Edytuj</a>
-			<a class="button-m" href="/sk/receive/<?= $receiveId ?>/delete">
+			<a class="button-m" href="<?=DIR . $urlMask?>/delete">
 				<i class="ico fa fa-trash"></i>Usuń</a>
 		</div>
 		<?php endif; ?>

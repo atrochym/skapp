@@ -45,14 +45,14 @@
 				</div>
 				<?php foreach($workers as $worker): 
 					extract($worker);	?>
-					
+					<!-- TODO ID mają się maskować w pętli przed wejściem do widoku phtml -->
 					<div class="worker-row" style="font: 14px Tahoma; display:flex; padding: 8px 11px; border-radius: 3px;">
 						<span class="worker-entry" style="width: 200px; "><?= $name ?></span>
 						<span class="worker-entry" style="width: 180px; "><?= $login ?></span>
 						<span class="worker-entry" style="width: 250px; "><?= $email ?></span>
 						<span class="worker-entry" style="width: 135px; "><?= $status ?></span>
-						<span class="worker-entry" style="width: 62px;" onclick="document.location='/sk/account/<?= $id ?>/edit'">Edytuj</span>
-						<span class="worker-entry" style="width: 75px;" onclick="document.location='/sk/account/<?= $id ?>/<?= $manageUrl ?>'"><?= $manage ?></span>
+						<span class="worker-entry" style="width: 62px;" onclick="document.location='account/<?= $id ?>/edit'">Edytuj</span>
+						<span class="worker-entry" style="width: 75px;" onclick="document.location='/sk/account/<?= $id?>/<?= $manageUrl ?>'"><?= $manage ?></span>
 						<span class="worker-entry" style="width: 90px; cursor:pointer;" onclick="document.location='/sk/account/<?= $id ?>/reset-password'">Resetuj hasło</span>
 					</div>
 				<?php endforeach; ?>
@@ -60,22 +60,78 @@
 				<br><br> Brak użytkowników do wyświetlenia.
 			<?php endif; ?>
 		</div>
-
-
+		<?php if (workerPermit('session_manager')): ?>
+		<div style="width:auto;height:auto;background-color: #2E373F;border-radius: 5px;margin-top: 25px;padding:12px 25px;">
+			<span class="content-block-header" style="display:inline;">Zaufane urządzenia</span>
+			<?php if ($workerDevices): ?>
+				<div style="margin: 25px 0 15px 0; font: 14px Tahoma; display:flex; ">
+					<span class="" style="width: 230px; ">Nazwa</span>
+					<span class="" style="width: 230px; ">Typ</span>
+					<span class="" style="width: 130px; ">Adres IP</span>
+					<span class="" style="width: 165px; ">Dodane</span>
+					<span class="" style="width: 165px; ">Ostatnia aktywność</span>
+				</div>
+				<?php foreach($workerDevices as $device): 
+					extract($device); ?>
+					
+					<div class="worker-row" style="font: 14px Tahoma; display:flex; padding: 8px 11px; border-radius: 3px;">
+						<span class="worker-entry" style="width: 230px; "><?= $name ?></span>
+						<span class="worker-entry" style="width: 230px; "><?= $type ?></span>
+						<span class="worker-entry" style="width: 130px; "><?= long2ip($ip) ?></span>
+						<span class="worker-entry" style="width: 165px; "><?= $created ?></span>
+						<span class="worker-entry" style="width: 165px; "><?= $last_login ?></span>
+						<span class="worker-entry" style="width: 75px;" onclick="document.location='/sk/account/device-delete/<?= $id ?>'">Usuń</span>
+					</div>
+				<?php endforeach; ?>
+			<?php else: ?>
+				<br><br> Brak urządzeń? xD
+			<?php endif; ?>
+		</div>
+	<?php endif; ?>
+	<?php if (workerPermit('session_manager')): ?>
+		<div style="width:auto;height:auto;background-color: #2E373F;border-radius: 5px;margin-top: 25px;padding:12px 25px;">
+			<span class="content-block-header" style="display:inline;">Urządzenia oczekujące na zatwierdzenie</span>
+			<?php if ($trustedDeviceRequests): ?>
+				<div style="margin: 25px 0 15px 0; font: 14px Tahoma; display:flex; ">
+					<span class="" style="width: 200px; ">Pracownik</span>
+					<span class="" style="width: 180px; ">Urządzenie</span>
+					<span class="" style="width: 130px; ">Adres IP</span>
+					<span class="" style="width: 355px; ">Data</span>
+				</div>
+				<?php foreach($trustedDeviceRequests as $device): 
+					extract($device);	?>
+					
+					<div class="worker-row" style="font: 14px Tahoma; display:flex; padding: 8px 11px; border-radius: 3px;">
+						<span class="worker-entry" style="width: 200px; "><?= $workerName ?></span>
+						<span class="worker-entry" style="width: 180px; "><?= $type ?></span>
+						<span class="worker-entry" style="width: 130px; "><?= long2ip($ip) ?></span>
+						<span class="worker-entry" style="width: 355px; "><?= $created ?></span>
+						<span class="worker-entry" style="width: 62px;" onclick="document.location='/sk/account/device-accept/<?= $id ?>'">Zezwól</span>
+						<span class="worker-entry" style="width: 75px;" onclick="document.location='/sk/account/device-decline/<?= $id ?>'">Odrzuć</span>
+					</div>
+				<?php endforeach; ?>
+			<?php else: ?>
+				<br><br> Brak requestów do wyświetlenia.
+			<?php endif; ?>
+		</div>
+	<?php endif; ?>
+	<?php if (workerPermit('permissions_manager')): ?>
 		<div style="width:auto;height:auto;background-color: #2E373F;border-radius: 5px;margin-top: 25px;padding:12px 25px;">
 			<span class="content-block-header" style="display:inline;">Uprawnienia</span>
 			<form method="post" action="/sk/account/permission">
 				<button class="button button-blue" type="submit" style="position: absolute; right: 30px;" name="">Zapisz</button>
 				<div style="display:flex; flex-wrap:wrap;margin-top:20px;">
-				<?php foreach($permissions as $key => $value):
+					<?php foreach($permissions as $name => $value):
 						$checkbox = (bool)$value ? 'checked' : '';
-				?>
+						$name = isset($permissionsNames[$name]) ? $permissionsNames[$name] : $name;
+					?>
 
-							<div style="height: 30px; display:flex;"> 
-							<input type="checkbox" name="permission['<?= $key ?>']" value="1" style="margin-right:20px;" <?= $checkbox ?>>
-								<span style="width:200px;"><?= $key ?></span>
-							</div>
-				<?php endforeach; ?>
+						<div style="height: 30px; display:flex;"> 
+						<input type="checkbox" name="permission['<?= $name ?>']" value="1" style="margin-right:20px;" <?= $checkbox ?>>
+							<span style="width:200px;"><?= $name ?></span>
+						</div>
+					<?php endforeach; ?>
 				</div>
 			</form>
 		</div>
+	<?php endif; ?>

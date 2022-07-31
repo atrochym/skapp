@@ -117,13 +117,13 @@ function parseUrl(event) {
 		index = url.indexOf("?");
 
 		if (index > 0) {
-			url = url.slice(0, index);
+			url = url.substring(0, index);
 		}
 
 		index = url.indexOf("#");
 
 		if (index > 0) {
-			url = url.slice(0, index)
+			url = url.substring(0, index)
 		}
 
 		index = url.lastIndexOf("-");
@@ -131,7 +131,7 @@ function parseUrl(event) {
 
 		url = url.substr(0, index);
 		url = url.replace(/-/g, " ");
-		url = url.charAt(0).toUpperCase() + url.slice(1);
+		url = url.charAt(0).toUpperCase() + url.substring(1);
 
 		name.value = url;
 		// note.value = item;
@@ -219,21 +219,7 @@ function insertCategory(jsonResponse) {
 	toggleOverlayWindow();
 }
 
-function showMessageBox(message) {
 
-	let messageDOM = document.querySelector('.message');
-	let separator = message.indexOf('::');
-
-	if (!separator)
-	{
-		console.log('showMessageBox :: wrong message format')
-	}
-	let messageType = message.slice(0, separator);
-	let messageContent = message.slice(separator + 2);
-
-	messageDOM.textContent = messageContent;
-	messageDOM.className = `message message-${messageType}`;
-}
 
 
 // function saveFormToStorage() {

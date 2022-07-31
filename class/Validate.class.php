@@ -7,7 +7,7 @@ class Validate {
 	public $_error;
 	public $_fieldFail;
 
-	public function add($fieldName, $input, $options)
+	public function add(string $fieldName, mixed $input, string $options): void
 	{
 		$this->_inputData[$fieldName] = [
 			'input' => trim($input),
@@ -15,7 +15,14 @@ class Validate {
 		];
 	}
 
-	public function getValid()
+	// public function once(string $fieldName, mixed $input, string $options): bool
+	// {
+	// 	$this->add($fieldName, $input, $options);
+
+	// 	return $this->check();
+	// }
+	
+	public function check(): bool
 	{
 		foreach ($this->_inputData as $fieldName => $element)
 		{
@@ -81,7 +88,7 @@ class Validate {
 		return true;
 	}
 
-	public function getValidData()
+	public function getValidData(): array
 	{
 		if ($this->_error)
 		{
@@ -219,6 +226,7 @@ class Validate {
 
 	private function intervalFilter($input)
 	{
+		$input = str_replace(' ', '', $input);
 		if (preg_match('/^\d*\-?\d*$/', $input) == 0)
 		{
 			return false;

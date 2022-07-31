@@ -41,6 +41,7 @@ class View {
 		extract($this->renderData);
 		$resource = 'templates/'.$this->views[0].'.phtml';
 		require_once ($resource);
+		exit;
 	}
 	
 	public function setMessage(string $message)

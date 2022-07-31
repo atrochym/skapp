@@ -5,6 +5,7 @@
 			$tag1 = substr($tag, 0, -4);
 			$tag2 = substr($tag, -4, 2);
 			$predicted = nameOfDay($predicted_datetime) . ', '.date('d.m', strtotime($predicted_datetime));
+			$urlMask = url('/receive/'.$receive_id);
 
 
 			// ETYKIETY przerobić na status
@@ -26,7 +27,8 @@
 	<div style="width: 100%; display: flex; align-items: stretch; min-height: 125px; margin-bottom: 12px; position: inherit;">
 		<!-- <div style="width: 800px; border-radius: 4px; background: #2E373F; padding-top: 14px; padding-left: 20px; position: inherit;"> -->
 
-		<div class="list-class" style="width: 800px; border-radius: 4px; background: #2E373F; position: inherit; cursor:pointer;"  onClick="location.href='/sk/receive/<?= $receive_id ?>'">
+		<!-- <div class="list-class" style="width: 800px; border-radius: 4px; background: #2E373F; position: inherit; cursor:pointer;"  onClick="location.href='/sk/receive/<?= $receive_id ?>'"> -->
+		<div class="list-class" style="width: 800px; border-radius: 4px; background: #2E373F; position: inherit; cursor:pointer;"  onClick="location.href='<?=DIR . $urlMask ?>'">
 			<div style="padding: 10px 10px; border-radius: 4px; background: #253e54; position:relative;display:inline-block;">
 				<span style="color:#a1d8f1;font-size:15px;font-weight: bold;"><?= $tag1; ?></span>
 				<span style="color:#a1d8f1;"> / <?= $tag2; ?></span>
@@ -44,7 +46,7 @@
 			<i class="fa fa-gears" style="color: #308B9E; top:14px;  left: 696px; position: absolute; font-size: 20px;"></i>
 				<span style=" top: 15px; left: 729px; position: absolute;">w trakcie</span>
 		<?php else: ?>
-			<span style=" top: 5px; left: 696px; position: absolute; padding: 5px 22px; border-radius: 3px; background: #1B5572;font-size:12px; cursor:pointer;" onClick="location.href='/sk/receive/<?= $receive_id ?>/start'">Rozpocznij</span>
+			<span style=" top: 5px; left: 696px; position: absolute; padding: 5px 22px; border-radius: 3px; background: #1B5572;font-size:12px; cursor:pointer;" onClick="location.href='<?=DIR . $urlMask?>/start'">Rozpocznij</span>
 		<?php endif; ?>
 
 		<div style="width: 254px; margin-left: 10px;padding: 15px 0 0 20px; border-radius: 4px; background: #2E373F;">

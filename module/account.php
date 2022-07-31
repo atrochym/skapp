@@ -4,17 +4,17 @@ if ($action == 'login')
 {
 	if (workerLoggedIn())
 	{
-		$controller->redirect('dashboard');
+		$router->redirect('/dashboard');
 	}
 
 	$validate = new Validate;
 	$validate->add('login', $_POST['worker_login'], 'login require');
 	$validate->add('password', $_POST['worker_password'], 'password require');
 
-	if (!$validate->getValid())
+	if (!$validate->check())
 	{
 		setMessage('error::Nieprawidłowy format loginu lub hasła.');
-		$controller->redirect('back');
+		$router->redirect('back');
 	}
 
 	$worker = new Worker($db);
@@ -22,18 +22,41 @@ if ($action == 'login')
 
 	if (!$result)
 	{
+		// if ($worker->message == 'notTrusted')
+		// {
+		// 	$router->redirect('/account/register-device');
+		// }
+
 		setMessage($worker->message);
-		$controller->redirect('account/login-form');
+		$router->redirect('/account/login-form');
 	}
 
-	if (isset($_SESSION['locationUrl']['afterLogin']))
+	// $ip = $_SERVER['REMOTE_ADDR'];
+	// $workerDevice = parseUserAgent($_SERVER['HTTP_USER_AGENT']);
+	// $workerDevice = $ip . $workerDevice['platform'] .' '. $workerDevice['browser'];
+
+	// $fingerprint = getFromCookie('fingerprint');
+
+	// if (!$fingerprint || !fingerprint($workerDevice, $fingerprint) || !$worker->device($fingerprint))
+	// {
+	// 	$router->redirect('/account/register-device');
+	// }
+
+	// if (isset($_SESSION['locationUrl']['afterLogin']))
+	// {
+	// 	$redirect = $_SESSION['locationUrl']['afterLogin'];
+	// 	unset($_SESSION['locationUrl']['afterLogin']);
+	// 	$router->redirect($redirect);
+	// }
+	
+	if (isset($_SESSION['locationUrl']['previous']))
 	{
-		$redirect = $_SESSION['locationUrl']['afterLogin'];
-		unset($_SESSION['locationUrl']['afterLogin']);
-		$controller->redirect($redirect);
+		$redirect = $_SESSION['locationUrl']['previous'];
+		// unset($_SESSION['locationUrl']['afterLogin']);
+		$router->redirect($redirect);
 	}
 	
-	$controller->redirect('dashboard');
+	$router->redirect(HOME_PAGE);
 
 
 }
@@ -41,7 +64,7 @@ elseif ($action == 'login-form')
 {
 	if (workerLoggedIn())
 	{
-		$controller->redirect('dashboard');
+		$router->redirect(HOME_PAGE);
 	}
 
 	$view->addView('account-login-form');
@@ -52,46 +75,49 @@ elseif ($action == 'logout')
 {
 	if (!workerLoggedIn())
 	{
-		$controller->redirect('account/login-form');
+		$router->redirect('/account/login-form');
 	}
 
+	setcookie('workerId', '', 0, '/');
+	setcookie('auth', '', 0, '/');
 	session_destroy();
 	session_start();
+	// session_regenerate_id(true);
 	setMessage('success::Wylogowano.');
-	$controller->redirect('account/login-form');
+	$router->redirect('/account/login-form');
 }
 elseif ($action == 'reset-password')
 {
 	if (!workerLoggedIn())
 	{
 		setMessage('warn::Wymagane zalogowanie się.');
-		$controller->redirect('account/login-form/redir');
+		$router->redirect('/account/login-form/redir');
 	}
 
 	$validate = new Validate;
 	$account = new Account($db);
-	$account->setWorkerId($controller->id());
+	$account->setWorkerId($router->getId());
 	$result = $account->resetPassword();
 
 	setMessage($account->message);
-	$controller->redirect('back');
+	$router->redirect('back');
 
 }
 elseif ($action == 'proceed-password')
 {
 	if (workerLoggedIn())
 	{
-		$controller->redirect('dashboard');
+		$router->redirect('/dashboard');
 	}
 
 	$validate = new Validate;
-	$validate->add('login', $controller->paramNumber(1), ('alnum require'));
-	$validate->add('token', $controller->paramNumber(2), ('alnum require'));
+	$validate->add('login', $router->getParam(1), ('alnum require'));
+	$validate->add('token', $router->getParam(2), ('alnum require'));
 
-	if (!$validate->getValid())
+	if (!$validate->check())
 	{
 		setMessage('warn::Link resetowania hasła jest niepoprawny.');
-		$controller->redirect('account/login-form');
+		$router->redirect('/account/login-form');
 	}
 
 	$account = new Account($db);
@@ -100,7 +126,7 @@ elseif ($action == 'proceed-password')
 	if (!$result)
 	{
 		setMessage($account->message);
-		$controller->redirect('account/login-form');
+		$router->redirect('/account/login-form');
 	}
 
 	$data = [
@@ -119,7 +145,7 @@ elseif ($action == 'password-change')
 {
 	if (workerLoggedIn())
 	{
-		$controller->redirect('dashboard');
+		$router->redirect('/dashboard');
 	}
 
 	$validate = new Validate;
@@ -127,12 +153,12 @@ elseif ($action == 'password-change')
 	$validate->add('workerId', $_POST['worker_id'], 'integer require');// index z inputa wtf
 	$validate->add('token', $_POST['token'], 'alnum require');
 
-	if ($validate->getValid())
+	if ($validate->check())
 	{
 		if($validate->password != $_POST['password_repeat'])
 		{
 			setMessage('info::Oba hasła powiny być identyczne.');
-			$controller->redirect('back');
+			$router->redirect('back');
 		}
 
 		$account = new Account($db);
@@ -140,7 +166,7 @@ elseif ($action == 'password-change')
 	
 		setMessage($account->message);
 		
-		$controller->redirect('account/login-form');
+		$router->redirect('/account/login-form');
 	}
 
 	if ($validate->_fieldFail == 'password')
@@ -149,7 +175,7 @@ elseif ($action == 'password-change')
 	}
 
 	// setMessage('info::Nie można zresetować hasła dla tego użytkownika (valid failed).');
-	$controller->redirect('back');
+	$router->redirect('back');
 
 }
 elseif ($action == 'create')
@@ -160,7 +186,7 @@ elseif ($action == 'create')
 	$validate->add('fullName', $_POST['name'], 'fullname require 6 40');
 	$validate->add('email', $_POST['email'], 'email require 8 60');
 
-	if($validate->getValid())
+	if($validate->check())
 	{
 		$account = new Account($db, $validate);
 		$account->create($validate->getValidData());
@@ -179,24 +205,24 @@ elseif ($action == 'create')
 	}
 
 	// setMessage('warn::Nie udało się stworzyć konta (validate failed).');
-	$controller->redirect('back');
+	$router->redirect('back');
 
 
 } elseif ($action == 'proceed-register')
 {
 	if (workerLoggedIn())
 	{
-		$controller->redirect('dashboard');
+		$router->redirect('/dashboard');
 	}
 
 	$validate = new Validate;
-	$validate->add('name', $controller->paramNumber(1), 'alnum require');
-	$validate->add('token',$controller->paramNumber(2), 'alnum require');
+	$validate->add('name', $router->getParam(1), 'alnum require');
+	$validate->add('token',$router->getParam(2), 'alnum require');
 
-	if (!$validate->getValid())
+	if (!$validate->check())
 	{
 		setMessage('warn::Link do konfiguracji konta jest niepoprawny.');
-		$controller->redirect('account/login-form');
+		$router->redirect('/account/login-form');
 	}
 
 	$account = new Account($db);
@@ -206,7 +232,7 @@ elseif ($action == 'create')
 	{
 		// $view->addData('message', $account->message); //użytć tego jak już ujednolice komunikaty
 		setMessage($account->message);
-		$controller->redirect('account/login-form');
+		$router->redirect('/account/login-form');
 	}
 
 	$data = [
@@ -224,7 +250,7 @@ elseif ($action == 'create-password')
 {
 	if (workerLoggedIn())
 	{
-		$controller->redirect('dashboard');
+		$router->redirect('/dashboard');
 	}
 	
 	formBackup(); // wyleci
@@ -236,19 +262,19 @@ elseif ($action == 'create-password')
 	$validate->add('token', $_POST['token'], ('alnum require'));
 	$passwordRepeat = trim($_POST['password_repeat']);
 
-	if ($validate->getValid())
+	if ($validate->check())
 	{
 		if ($validate->password != $passwordRepeat)
 		{
 			setMessage('warn::Oba hasła powiny być identyczne.');
-			$controller->redirect('back');
+			$router->redirect('back');
 		}
 
 		$account = new Account($db);
 		$result = $account->createPassword($validate->getValidData());
 		setMessage($account->message);
 
-		$controller->redirect('account/login-form');
+		$router->redirect('/account/login-form');
 	}
 
 	if ($validate->_fieldFail == 'login')
@@ -262,27 +288,27 @@ elseif ($action == 'create-password')
 	}
 
 	// setMessage('warn::Dane wejściowe są niepoprawne (valid failed).');
-	$controller->redirect('back');
+	$router->redirect('back');
 
 }
 elseif ($action == 'disable')
 {
 	$account = new Account($db);
-	$account->setWorkerId($controller->id());
+	$account->setWorkerId($router->getId());
 	$account->disable();
 
 	setMessage($account->message);
-	$controller->redirect('back');
+	$router->redirect('back');
 
 }
 elseif ($action == 'enable') // powtarzam podobny kod, ogarnąć
 {
 	$account = new Account($db);
-	$account->setWorkerId($controller->id());
+	$account->setWorkerId($router->getId());
 	$account->enable();
 
 	setMessage($account->message);
-	$controller->redirect('back');
+	$router->redirect('back');
 
 }
 elseif ($action == 'edit')
@@ -290,5 +316,255 @@ elseif ($action == 'edit')
 	echo '<br><br> TODO edit account worker';
 	exit;
 }
+elseif ($action == 'register-device' && workerLoggedIn() && !getFromSession('trustedDevice'))
+{
+	$fingerprint = getFromCookie('fingerprint');
 
+	if ($fingerprint && checkDeviceFingerprint($fingerprint))
+	{
+		$values = [
+			'workerId' => getFromSession('workerId'),
+			'fingerprint' => $fingerprint,
+		];
+		$trustedDevice = $db->run('SELECT * FROM workers_devices WHERE worker_id = :workerId AND fingerprint = :fingerprint AND deleted = 0 LIMIT 1', $values)->fetch();
+
+		if ($trustedDevice && $trustedDevice['status'] == NULL)
+		{
+			$view->addView('account-register-device-accept');
+			$view->renderSingle();
+		}
+		elseif ($trustedDevice && $trustedDevice['status'] == 'allow')
+		{
+			$db->run('UPDATE workers_devices SET last_login = NOW() WHERE id = :id', $trustedDevice['id']);
+			setToSession('trustedDevice', $trustedDevice['id']);
+			$router->redirect();
+		}
+		elseif ($trustedDevice && $trustedDevice['status'] == 'deny')
+		{
+			session_destroy();
+			session_start();
+			setMessage('error::Urządzenie nie zostało zaakceptowane przez administratora.');
+			$router->redirect('/account/login-form');
+		}
+	}
+
+	if (workerPermit('session_manager'))
+	{
+		if (!empty($_POST))
+		{
+			$validate = new Validate;
+			$validate->add('deviceName', $_POST['device_name'], 'require text 3 60');
+			if (!$validate->check())
+			{
+				setMessage('warn::Nazwa urządzenia ma nieprawidłową długość lub format.');
+				$router->redirect('back');
+			}
+
+			$newDevice = registerDevice($db, $validate->deviceName);
+			if ($newDevice)
+			{
+				setcookie('fingerprint', $newDevice['fingerprint'], time() + 2592000, '/', '', true, true);
+				setToSession('trustedDevice', $newDevice['id']);
+				setMessage('info::Urządzenie '. $validate->deviceName .' zostało dodane do listy zaufanych. Możesz zarządzać zaufanymi urządzeniami w ustawieniach.');
+				$router->redirect();
+			}
+
+			setMessage('warn::Nie udało się zarejestrować urządzenia.');
+			$router->redirect('back');
+		}
+
+
+			$device = parseUserAgent();
+			$device = $device['platform'] .' '. $device['browser'];
+
+			$view->addData(['device' => $device]);
+			$view->addView('account-register-device');
+			$view->renderSingle();
+	}
+	else
+	{
+		$newDevice = registerDevice($db);
+		if ($newDevice)
+		{
+			setcookie('fingerprint', $newDevice['fingerprint'], time() + 2592000, '/', '', true, true);
+			$view->addView('account-register-device-accept');
+			$view->renderSingle();
+		}
+		setMessage('warn::Nie udało się zarejestrować urządzenia.');
+		$router->redirect('back');
+	}
+}
+elseif($action == 'device-accept' && testworkerPermit('session_manager'))
+{
+	// może możliwość cofnięcia przez ileś tam minut
+	// wywalić komunikat z showMessage bo nadpisuje inny
+	$id = $router->getId();
+	
+	$db = new Database;
+	$validate = new Validate;
+	$validate->add('id', $id, 'require integer');
+
+	if (!$validate->check())
+	{
+		setMessage('warn::Błąd walidacji danych.');
+		$router->redirect('back');
+	}
+
+	$device = $db->run(
+		'SELECT wd.*, w.name AS workerName FROM workers_devices AS wd 
+		JOIN workers AS w ON wd.worker_id = w.id
+		WHERE wd.id = :id LIMIT 1', $validate->id)
+		->fetch();
+
+	if (!$device || $device['deleted'] || $device['accepted'])
+	{
+		setMessage('error::Request nie istnieje.');
+		$router->redirect('back');
+	}
+
+	$db->run('UPDATE workers_devices SET status = "allow" WHERE id = :id', $validate->id);
+	setMessage("success::Urządzenie użytkownika '".$device['workerName']."' zostało zaakceptowane.");
+	$router->redirect('back');
+}
+elseif($action == 'device-decline' && testworkerPermit('session_manager'))
+{
+	// może możliwość cofnięcia przez ileś tam minut
+	// wywalić komunikat z showMessage bo nadpisuje inny
+	$id = $router->getId();
+	
+	$db = new Database;
+	$validate = new Validate;
+	$validate->add('id', $id, 'require integer');
+
+	if (!$validate->check())
+	{
+		setMessage('warn::Błąd walidacji danych.');
+		$router->redirect('back');
+	}
+
+	$device = $db->run(
+		'SELECT wd.*, w.name AS workerName FROM workers_devices AS wd 
+		JOIN workers AS w ON wd.worker_id = w.id
+		WHERE wd.id = :id LIMIT 1', $validate->id)
+		->fetch();
+
+	if (!$device || $device['deleted'] || $device['accepted'])
+	{
+		setMessage('error::Request nie istnieje.');
+		$router->redirect('back');
+	}
+
+	$db->run('UPDATE workers_devices SET status = "deny" WHERE id = :id', $validate->id);
+	setMessage("warn::Urządzenie użytkownika '".$device['workerName']."' zostało odrzucone.");
+	$router->redirect('back');
+}
+elseif ($action == 'device-delete' && testworkerPermit('session_manager'))
+{
+	$id = $router->getId();
+	$workerId = getFromSession('workerId');
+	$validate = new Validate;
+	$validate->add('id', $id, 'require integer');
+
+	if (!$validate->check())
+	{
+		setMessage('error::Błąd walidacji danych.');
+		$router->redirect('back');
+	}
+
+	$worker = new Worker($db);
+	$worker->setWorkerId($workerId);
+	if ($worker->deleteDevice($validate->id))
+	{
+		setMessage("success::Urządzenie zostało usunięte z listy dozwolonych.");
+		$router->redirect('back');
+	}
+	else
+	{
+		setMessage($worker->message);
+		$router->redirect('back');
+	}
+
+	// $workerDevice = $db->run('SELECT worker_id, fingerprint FROM workers_devices WHERE id = :id', $validate->id)->fetch();
+
+	// if (!$workerDevice)
+	// {
+	// 	setMessage('error::Urządzenie nie istnieje.');
+	// 	$router->redirect('back');
+
+	// }
+	// elseif ($workerDevice['worker_id'] != $workerId)
+	// {
+	// 	setMessage('warn::Brak uprawnień.');
+	// 	$router->redirect('back');
+
+	// }
+
+	// $db->run('UPDATE workers_devices SET deleted = 1 WHERE id = :id', $validate->id);
+	// setMessage('success::Urządzenie zostało usunięte.');
+	// $router->redirect('back');
+}
+
+
+
+
+
+// 	if(empty($_POST))
+// 	{
+// 		if (workerPermit('session_manager'))
+// 		{
+// 			// jest też zduplikowamy w worker.class
+// 			$device = parseUserAgent();
+// 			$device = $device['platform'] .' '. $device['browser'];
+
+// 			$view->addData(['device' => $device]);
+// 			$view->addView('account-register-device');
+// 			$view->renderSingle();
+// 		}
+// 		else
+// 		{
+
+// 			// wyślij rquest o zaakceptowanie urządzenia
+// 			$view->addView('account-register-device-accept');
+// 			$view->renderSingle();
+// 		}
+// 	}
+
+// 	$validate = new Validate;
+// 	$validate->add('deviceName', $_POST['device_name'], 'require text 3 60');
+// 	if (!$validate->check())
+// 	{
+// 		setMessage('warn::Nazwa urządzenia ma nieprawidłową długość lub format.');
+// 		$router->redirect('back');
+// 	}
+
+// 	$workerId = getFromSession('workerId');
+// 	$accepted = workerPermit('session_manager') ? 1 : 0;
+// 	$device = parseUserAgent();
+// 	$fingerprint = getFromCookie('fingerprint');
+
+// 	if (!$fingerprint || !deviceFingerprint($fingerprint))
+// 	{
+// 		$fingerprint = deviceFingerprint();
+// 	}
+
+// 	$values = [
+// 		'worker_id' => $workerId,
+// 		'name' => $validate->deviceName,
+// 		'type' => $device['platform'] . ' ' .$device['browser'],
+// 		'fingerprint' => $fingerprint,
+// 		'ip' => ip2long(getIP()),
+// 		'accepted' => $accepted,
+// 	];
+// 	$result = $db->insert('workers_devices', $values);
+// 	setToSession('trustedDevice', 1);
+// 	setcookie('fingerprint', $fingerprint, time() + 2592000, '/', '', true, true);
+
+// 	setMessage('info::Urządzenie '. $validate->deviceName .' zostało dodane do listy zaufanych. Możesz zarządzać zaufanymi urządzeniami w ustawieniach.');
+// 	$router->redirect();
+
+// }
+else
+{
+	$router->redirect();
+}
 // atdev.ddns.net/sk/account/proceed-register/nazwiskoiimie/0d4bd044b12654e

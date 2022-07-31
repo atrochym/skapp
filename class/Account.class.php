@@ -14,8 +14,8 @@ class Account
 
 	public function create(array $data)
 	{
-		$values = ['email' => $data['email']];
-		$result = $this->db->run("SELECT id FROM workers WHERE email = :email", $values);
+		// transakcja?
+		$result = $this->db->run("SELECT id FROM workers WHERE email = :email", $data['email']);
 
 		if ($result->rowCount())
 		{
@@ -23,7 +23,7 @@ class Account
 			return false;
 		}
 
-		$tempPassword = substr(md5(rand() . 'tmp'), 0, 20);
+		$tempPassword = $this->makeToken(20);
 		$tempLogin = str_replace([' ', 'ą', 'ć', 'ę', 'ł', 'ń', 'ó', 'ś', 'ż', 'ź'], ['', 'a', 'c', 'e', 'l', 'n', 'o', 's', 'z', 'z'], strtolower($data['fullName']));
 
 		$values = [
@@ -34,7 +34,7 @@ class Account
 			'security_token' => $this->makeToken()
 		];
 		$newWorkerId = $this->db->insert('workers', $values);
-		$token =  $this->makeToken(15);
+		$token =  $this->makeToken();
 
 		$values = [
 			'worker_id' => $newWorkerId,
@@ -98,7 +98,7 @@ class Account
 			return false;
 		}
 
-		$worker = $this->db->run('SELECT name, login FROM workers WHERE id = :id', ['id' => $exec['worker_id']])->fetch();
+		$worker = $this->db->run('SELECT name, login FROM workers WHERE id = :id', $exec['worker_id'])->fetch();
 
 		$this->worker['id'] = $exec['worker_id'];
 		$this->worker['name'] = $worker['name'];
@@ -123,15 +123,13 @@ class Account
 			return false;
 		}
 
-		$this->worker['id'] = $data['workerId']; // dla preparePassword, może jakoś inaczej?
-
 		$values = [
-			'password' => $this->preparePassword($data['password']),
+			'password' => password_hash($data['password'], PASSWORD_BCRYPT),
 			'workerId' => $data['workerId'],
 		];
-		$this->db->run('UPDATE workers SET password = SHA2(:password, 256) WHERE id = :workerId', $values);
-		$this->db->run('UPDATE password_changes SET is_valid = 0 WHERE id = :id', ['id' => $request['id']]);
-		$worker = $this->db->run('SELECT name FROM workers WHERE id = :id', ['id' => $data['workerId']])->fetch();
+		$this->db->run('UPDATE workers SET password = :password WHERE id = :workerId', $values);
+		$this->db->run('UPDATE password_changes SET is_valid = 0 WHERE id = :id', $request['id']);
+		$worker = $this->db->run('SELECT name FROM workers WHERE id = :id', $data['workerId'])->fetch();
 
 		$this->message = 'success::Hasło dla '. $worker['name'] .' zostało zmienione, zaloguj się.';
 		return true;
@@ -139,11 +137,7 @@ class Account
 
 	public function createPassword(array $data)
 	{
-		$values = [
-			'login' => $data['login'],
-		];
-
-		$exec = $this->db->run('SELECT id FROM workers WHERE login = :login', $values)->fetch();
+		$exec = $this->db->run('SELECT id FROM workers WHERE login = :login', $data['login'])->fetch();
 
 		if ($exec)
 		{
@@ -164,18 +158,16 @@ class Account
 			return false;
 		}
 
-		$this->worker['id'] = $data['workerId']; // dla preparePassword
-
 		$values = [
-			'password' => $this->preparePassword($data['password']),
+			'password' => password_hash($data['password'], PASSWORD_BCRYPT),
 			'id' => $data['workerId'],
 			'login' => $data['login'],
 		];
 
-		$this->db->run('UPDATE workers SET password = SHA2(:password, 256), login = :login, is_activated = 1 WHERE id = :id', $values);
-		$this->db->run('UPDATE password_changes SET is_valid = 0 WHERE id = :id', ['id' => $exec['id']]);
+		$this->db->run('UPDATE workers SET password = :password, login = :login, activated = 1 WHERE id = :id', $values);
+		$this->db->run('UPDATE password_changes SET is_valid = 0 WHERE id = :id', $exec['id']);
 		$this->db->insert('permissions', ['worker_id' => $data['workerId']]);
-		$this->worker = $this->db->run('SELECT name FROM workers WHERE id = :id', ['id' => $data['workerId']])->fetch();
+		$this->worker = $this->db->run('SELECT name FROM workers WHERE id = :id', $data['workerId'])->fetch();
 
 		$this->message = 'success::Konfiguracja konta "'. $this->worker['name'] .'" została zakończona, zaloguj się.';
 		return true;
@@ -189,7 +181,7 @@ class Account
 		}
 
 		// przenieść do innej metody
-		$token = $this->makeToken(15);
+		$token = $this->makeToken();
 		$values = [
 			'worker_id' => $this->workerId,
 			'worker_login' => $this->worker['login'],
@@ -225,8 +217,7 @@ class Account
 			return;
 		}
 
-		$values = ['workerId' => $this->workerId];
-		$result = $this->db->run('SELECT id FROM password_changes WHERE worker_id = :workerId AND is_valid = 1', $values)->fetch();
+		$result = $this->db->run('SELECT id FROM password_changes WHERE worker_id = :workerId AND is_valid = 1', $this->workerId)->fetch();
 
 		if ($result)
 		{
@@ -245,11 +236,11 @@ class Account
 		}
 
 		$values = [
-			'token' => $this->makeToken(10),
+			'token' => $this->makeToken(),
 			'workerId' => $this->workerId,
 		];
 
-		$this->db->run('UPDATE workers SET is_disabled = 1, security_token = :token WHERE id = :workerId', $values);
+		$this->db->run('UPDATE workers SET disabled = 1, security_token = :token WHERE id = :workerId', $values);
 		$this->message = 'success::Konto pracownika '. $this->worker['name'] .' zostało wyłączone.';
 		return true;
 	}
@@ -262,20 +253,21 @@ class Account
 		}
 
 		$values = [
-			'token' => $this->makeToken(10),
+			'token' => $this->makeToken(),
 			'workerId' => $this->workerId,
 		];
 
-		$this->db->run('UPDATE workers SET is_disabled = 0, security_token = :token WHERE id = :workerId', $values);
+		$this->db->run('UPDATE workers SET disabled = 0, security_token = :token WHERE id = :workerId', $values);
 		$this->message = 'success::Konto pracownika '. $this->worker['name'] .' zostało włączone.';
 		return true;
 	}
 
 
-	public function logout()
+	public function logout_() // nie używam
 	{
-		session_destroy();
-		session_start();
+		session_regenerate_id();
+		// session_destroy();
+		// session_start();
 
 		$this->message = 'Zostałeś wylogowany';
 		return true;
@@ -316,12 +308,12 @@ class Account
 	}
 	
 
-	private function makeToken($lenght = 10)
+	private function makeToken($lenght = 15)
 	{
-		return substr(md5(rand() . 'token'), 0, $lenght);
+		return substr(sha1(rand() . 'token'), 0, $lenght);
 	}
 
-	private function preparePassword(string $password)
+	private function preparePassword(string $password) // metoda również w Worker
 	{
 		$salt = $this->worker['id'] . 'id-sk-app';
 		return $salt . $password;
@@ -332,10 +324,9 @@ class Account
 		$this->workerId = $workerId;
 	}
 
-	private function getData()
+	private function getData() // zamiast duplikować może stworzyć obiekt Worker i getData() ?
 	{
-		$data = ['workerId' => $this->workerId];
-		$result = $this->db->run('SELECT * FROM workers WHERE id = :workerId', $data);
+		$result = $this->db->run('SELECT * FROM workers WHERE id = :workerId', $this->workerId);
 
 		if (!$result->rowCount())
 		{
@@ -355,8 +346,7 @@ class Account
 			return $this->worker;
 		}
 
-		$values = ['workerId' => $this->workerId];
-		$worker = $this->db->run('SELECT * FROM workers WHERE id = :workerId', $values)->fetch();
+		$worker = $this->db->run('SELECT * FROM workers WHERE id = :workerId', $this->workerId)->fetch();
 
 		if (!$worker)
 		{

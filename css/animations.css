@@ -1,0 +1,28 @@
+@-webkit-keyframes create-success {
+  0% {
+    background-color: #01743a;
+  }
+  60% {
+    background-color: #01743a;
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+@keyframes create-success {
+  0% {
+    background-color: #01743a;
+  }
+  60% {
+    background-color: #01743a;
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+.create-success {
+  -webkit-animation-name: create-success;
+          animation-name: create-success;
+  -webkit-animation-duration: 1.3s;
+          animation-duration: 1.3s;
+}/*# sourceMappingURL=animations.css.map */

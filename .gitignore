@@ -1,10 +1,11 @@
 config.php
 jsconfig.json
 test.php
+feature.php
 _*
 
 **/.DAV
 /.vscode
 /.VSCodeCounter
-/scss
 /log
+/tmp

@@ -1,6 +1,6 @@
 <?php
 
-$customerId = $controller->id();
+$customerId = $router->getId();
 
 $view->joinCSS('customer');
 
@@ -12,10 +12,10 @@ if ($action == 'create')
 	$validate->add('name', $_POST['name'], 'text 0 100');
 	$validate->add('email', $_POST['email'], 'email 8 60');
 
-	if (!$validate->getValid())
+	if (!$validate->check())
 	{
 		setMessage('error::Błąd walidacji danych.');
-		$controller->redirect('customer/register');
+		$router->redirect('/customer/register');
 	}
 
 	$validData = $validate->getValidData();
@@ -28,24 +28,34 @@ if ($action == 'create')
 
 	if ($result === false)
 	{
-		$controller->redirect('customer/register');
+		$router->redirect('/customer/register');
 	}
 
-	$controller->redirect('customer/' . $result);
+	// $router->redirect('/customer/' . $result);
+	$router->redirect(url('/customer/' . $result));
+
 
 }
 elseif ($action == 'update') // zostaje
 {
+	$id = unmaskId($_POST['customer_id']);
+	if (!$id)
+	{
+		// setMessage('error::y tego.');
+		// $router->redirect('back');
+		$router->errorPage(403);
+	}
+
 	$validate = new Validate;
-	$validate->add('customerId', $_POST['customer_id'], 'require integer');
+	$validate->add('customerId', $id, 'require integer');
 	$validate->add('phone', $_POST['phone'], 'require phone 5-15');
 	$validate->add('name', $_POST['name'], 'text 0-100');
 	$validate->add('email', $_POST['email'], 'email');
 	
-	if (!$validate->getValid())
+	if (!$validate->check())
 	{
 		setMessage('error::Wystąpił błąd podczas walidacji danych.');
-		$controller->redirect('back');
+		$router->redirect('back');
 	}
 
 	$validData = $validate->getValidData();
@@ -56,7 +66,8 @@ elseif ($action == 'update') // zostaje
 	$customer->update($validData);
 
 	setMessage($customer->message);
-	$controller->redirect('customer/' . $validate->customerId);	
+	// $router->redirect('customer/' . $validate->customerId);
+	$router->redirect('back');
 
 } elseif ($action == 'edit-conflict') { // raczej wyleci
 	// na razie nie używane, info w modelu
@@ -76,7 +87,7 @@ elseif ($action == 'update') // zostaje
 
 	if (!$result['success']) {
 		$model->message->set($result);
-		$controller->redirect('back');
+		$router->redirect('back');
 	}
 
 	$customerView = new CustomerView($view);
@@ -96,7 +107,7 @@ elseif ($action == 'update') // zostaje
 
 	if (!$result['success']) {
 		$model->message->set($result);
-		$controller->redirect('back');
+		$router->redirect('back');
 	}
 
 	$customerView = new CustomerView($view);
@@ -125,7 +136,7 @@ elseif ($action == 'list')
 	}
 
 	setMessage($customer->message);
-	$controller->redirect('customer/register');
+	$router->redirect('/customer/register');
 
 }
 elseif ($action == 'register') //zostaje
@@ -143,7 +154,7 @@ elseif ($action == 'history') //zostaje
 elseif ($action == 'edit')
 {
 	$customer = new Customer($db);
-	$customer->setCustomerId($controller->id());
+	$customer->setCustomerId($router->getId());
 	$customerData = $customer->getData();
 
 	$view->addData($customerData);
@@ -154,7 +165,7 @@ elseif ($action == 'edit')
 elseif ($action == 'test')
 {
 
-	$customerId = $controller->id();
+	$customerId = $router->getId();
 	$customer = new Customer($db);
 
 	$customerModel = new CustomerModel($model);
@@ -166,7 +177,7 @@ elseif ($action == 'test')
 	$customerView->render();
 }
 
-$customerId = $controller->id();
+$customerId = $router->getId();
 
 $validate = new Validate;
 $customer = new Customer($db, $validate);
@@ -176,7 +187,7 @@ $customerData = $customer->getData();
 if ($customerData === false)
 {
 	setMessage($customer->message);
-	$controller->redirect('desktop');
+	$router->redirect('/desktop');
 }
 
 $devices = $customer->devices();

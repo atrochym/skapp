@@ -1,0 +1,124 @@
+@use 'main' as m
+
+$borderColor: #546776
+$inputColor: #41505C
+
+.part
+	&-input
+		display: inline-block
+		margin-right: 10px
+		font-size: 12px
+		
+		&::placeholder
+			color: #b3b1b1
+
+.item
+	position: relative
+	border: solid white 0px
+	padding: 20px 25px
+
+	&:hover
+		background-color: #344049
+
+.item-icons
+	position: absolute
+	right: 25px
+	top: 20px
+
+	.icon
+		width: 22px
+		height: 22px
+		text-align: center
+		border: 0px white solid
+		color: #40474e
+
+		&:hover
+			color: #308B9E
+
+		&-copy
+			margin-right: 6px
+			font-size: 20px
+
+		&-remove
+			line-height: 20px
+			font-size: 23px
+
+.select-category
+	display: inline-block
+	width: 185px
+	padding: 3px
+	font-size: 12px
+	margin-right: 10px
+
+.amount-adjust
+	width: 16px
+	height: 16px
+	text-align: center
+	vertical-align: middle
+	color: #40474e
+	font-size: 15px
+
+	&:hover
+		color: #308B9E
+
+.checkbox-custom
+	cursor: pointer
+	user-select: none
+	margin-right: 10px
+	vertical-align: middle
+	display: inline-block
+	
+	input
+		display: none
+	
+	/* Create a custom checkbox */
+	.checkbox 
+		display: block
+		width: 25px
+		height: 24px
+		background-color: $inputColor
+		border-radius: 4px
+		border: solid 1px $borderColor
+		padding: 3px 8px
+
+	/* Create the checkmark/indicator (hidden when not checked) */
+	.checkbox:after 
+		content: ""
+		display: none
+
+	/* On mouse-over, add a grey background color */
+	&:hover input ~ .checkbox 
+		border-color: #66AFE9
+		box-shadow: inset 0px 1px 1px rgba(0,0,0,0.075), 0px 0px 8px rgba(102,175,233,0.70)
+
+	/* Show the checkmark when checked */
+	input:checked ~ .checkbox:after 
+		display: block
+	
+	/* Style the checkmark/indicator */
+	.checkbox:after 
+		width: 8px
+		height: 14px
+		border: solid
+		border-width: 0 3px 3px 0
+		transform: rotate(35deg)
+
+.customer-language
+	@extend .checkbox-custom
+	display: block
+	margin: 14px 0 0 5px
+
+
+.input-date
+	padding: 2px 3px 3px 3px
+
+
+// Category create form
+
+
+//--
+
+
+// tests użyty w js do toggla
+.display-block
+	display: block
