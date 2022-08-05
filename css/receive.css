@@ -146,7 +146,7 @@ a {
 .input {
   display: block;
   border-radius: 4px;
-  border: #224561 1px solid;
+  border: #546776 1px solid;
   background-color: #41505C;
   padding: 4px;
 }
@@ -375,7 +375,7 @@ button.service-top-menu:hover {
   display: none;
 }
 
-.input-new, .input-box {
+.input-new {
   display: block;
   border-radius: 4px;
   border: #546776 1px solid;
@@ -496,6 +496,52 @@ button.service-top-menu:hover {
   display: none !important;
 }
 
+.checkbox-custom, .customer-language {
+  cursor: pointer;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  margin-right: 10px;
+  vertical-align: middle;
+  display: inline-block;
+  /* Create a custom checkbox */
+  /* Create the checkmark/indicator (hidden when not checked) */
+  /* On mouse-over, add a grey background color */
+  /* Show the checkmark when checked */
+  /* Style the checkmark/indicator */
+}
+.checkbox-custom input, .customer-language input {
+  display: none;
+}
+.checkbox-custom .checkbox, .customer-language .checkbox {
+  display: block;
+  width: 25px;
+  height: 24px;
+  background-color: #41505C;
+  border-radius: 4px;
+  border: solid 1px #546776;
+  padding: 3px 8px;
+}
+.checkbox-custom .checkbox:after, .customer-language .checkbox:after {
+  content: "";
+  display: none;
+}
+.checkbox-custom:hover input ~ .checkbox, .customer-language:hover input ~ .checkbox {
+  border-color: #66AFE9;
+  box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.075), 0px 0px 8px rgba(102, 175, 233, 0.7);
+}
+.checkbox-custom input:checked ~ .checkbox:after, .customer-language input:checked ~ .checkbox:after {
+  display: block;
+}
+.checkbox-custom .checkbox:after, .customer-language .checkbox:after {
+  width: 8px;
+  height: 14px;
+  border: solid;
+  border-width: 0 3px 3px 0;
+  transform: rotate(35deg);
+}
+
 @-webkit-keyframes create-success {
   0% {
     background-color: #01743a;
@@ -553,11 +599,100 @@ button.service-top-menu:hover {
   color: #B2B2B2;
 }
 
+.top-menu {
+  display: flex;
+  justify-content: space-between;
+  background-color: #2E373F;
+  width: 100%;
+  margin-bottom: 30px;
+}
+.top-menu .button-m {
+  display: inline-block;
+  padding: 9px 20px 9px 15px;
+}
+.top-menu .button-m:hover {
+  background-color: #005279;
+}
+.top-menu .ico {
+  margin: 0 10px 0 0;
+  font-size: 16px;
+}
+.top-menu .right-ico {
+  font-size: 16px;
+  margin: 0 12px 0 0;
+}
+.top-menu .right-field {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 9px 15px 9px 10px;
+}
+
+.issue-box {
+  text-align: left;
+  width: 100%;
+}
+
+.notice-box {
+  padding: 0 28px;
+}
+
+.history {
+  padding-bottom: 0;
+}
+.history .title {
+  padding-bottom: 15px;
+}
+
+.history-list {
+  width: 100%;
+  text-align: left;
+  border-spacing: 0 5px;
+}
+.history-list .row:hover {
+  background-color: #005279;
+}
+.history-list td {
+  padding: 5px 0 5px 4px;
+}
+.history-list .kek {
+  padding-left: 24px;
+}
+.history-list .col1 {
+  width: 75px;
+  padding-left: 28px;
+}
+.history-list .col3 {
+  width: 110px;
+  color: #B2B2B2;
+  font-size: 12px;
+}
+
+.animate {
+  width: inherit;
+}
+
+.ico-test {
+  border: 1px #546776 solid;
+  border-radius: 3px;
+  text-align: center;
+  width: 24px;
+  font-size: 16px;
+  position: absolute;
+  top: 8px;
+  right: 16px;
+  padding: 1px 0 5px 0;
+  transition-duration: 0.5s;
+}
+.ico-test-rotate {
+  transform: rotate(180deg);
+}
+
 .customer-box .save {
   margin-left: 200px;
 }
 
-.input-new, .input-box {
+.input-new {
   display: block;
   border-radius: 4px;
   border: #546776 1px solid;
@@ -565,144 +700,10 @@ button.service-top-menu:hover {
   padding: 4px;
 }
 
-.issue-box {
-  align-content: flex-start;
-  max-width: 825px;
-  margin-right: 5px;
-}
-.issue-box-input-notice {
-  width: 285px;
-}
-.issue-box .column-1 {
-  padding-left: 28px;
-}
-.issue-box .column-2 {
-  padding-left: 45px;
-}
-.issue-box .password {
-  display: inline-block;
-  width: 320px;
-  margin: 0 0 0 15px;
-}
-.issue-box .horizontal {
-  margin: 0 0 20px 0;
-  display: block;
-}
-.issue-box .prediction {
-  display: inline-block;
-  margin: 0 0 0 15px;
-  padding: 2px 0 3px 4px;
-  height: 25px;
-}
-.issue-box .prediction-date {
-  width: 135px;
-}
-.issue-box .prediction-time {
-  width: 80px;
-}
-
-.input-box {
-  margin-left: 5px;
-  margin-top: 14px;
-  resize: vertical;
-  min-height: 70px;
-  max-height: 150px;
-}
-.input-box-issue {
-  width: 420px;
-}
-.input-box-notice {
-  width: 282px;
-}
-
-.valuation-box {
-  margin-right: 5px;
-  align-content: flex-start;
-}
-.valuation-box .solution-area {
-  width: 610px;
-  padding-left: 28px;
-}
-.valuation-box .solution {
-  display: inline-block;
-  width: 300px;
-  vertical-align: middle;
-}
-.valuation-box .price {
-  width: 105px;
-  display: inline-block;
-  vertical-align: middle;
-  margin-left: 20px;
-}
-.valuation-box .remove, .valuation-box .remove-deny {
-  font-size: 22px;
-  color: #546776;
-  padding-left: 20px;
-  margin-top: 10px;
-  vertical-align: middle;
-}
-.valuation-box .add {
-  font-size: 21px;
-  color: #308B9E;
-  padding-left: 20px;
-  margin-top: 11px;
-  vertical-align: middle;
-}
-.valuation-box .empty {
-  padding-left: 439px;
-  padding-top: 4px;
-}
-
-.price-area {
-  width: 245px;
-}
-.price-area .price-total {
-  font-weight: bold;
-  padding: 14px 0 0 8px;
-  display: block;
-  font-size: 14px;
-}
-
-.advance-area {
-  display: block;
-}
-.advance-area .advance-input {
-  width: 125px;
-  vertical-align: middle;
-  display: inline-block;
-}
-.advance-area .erase {
-  font-size: 22px;
-  color: #546776;
-  padding-left: 20px;
-  margin-top: 10px;
-  vertical-align: middle;
-}
-
-.options-box {
-  width: 250px;
-  flex-direction: column;
-  padding: 20px 0 0 20px;
-}
-.options-box .field {
-  margin: 0 0 22px 0;
-}
-
-.field {
-  width: 260px;
-}
-.field-first {
-  width: 260px;
-  margin-left: 28px;
-}
-.field-last {
-  width: 220px;
-}
-
 .input {
   display: block;
   border-radius: 4px;
-  border: #224561 1px solid;
+  border: #546776 1px solid;
   background-color: #41505C;
   padding: 4px;
 }
@@ -711,81 +712,9 @@ button.service-top-menu:hover {
   background-color: #376FB3;
 }
 
-.checkbox-custom, .customer-language {
-  cursor: pointer;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
-  margin-right: 10px;
-  vertical-align: middle;
-  display: inline-block;
-  /* Create a custom checkbox */
-  /* Create the checkmark/indicator (hidden when not checked) */
-  /* On mouse-over, add a grey background color */
-  /* Show the checkmark when checked */
-  /* Style the checkmark/indicator */
-}
-.checkbox-custom input, .customer-language input {
-  display: none;
-}
-.checkbox-custom .checkbox, .customer-language .checkbox {
-  display: block;
-  width: 25px;
-  height: 24px;
-  background-color: #41505C;
-  border-radius: 4px;
-  border: solid 1px #546776;
-  padding: 3px 8px;
-}
-.checkbox-custom .checkbox:after, .customer-language .checkbox:after {
-  content: "";
-  display: none;
-}
-.checkbox-custom:hover input ~ .checkbox, .customer-language:hover input ~ .checkbox {
-  border-color: #66AFE9;
-  box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.075), 0px 0px 8px rgba(102, 175, 233, 0.7);
-}
-.checkbox-custom input:checked ~ .checkbox:after, .customer-language input:checked ~ .checkbox:after {
-  display: block;
-}
-.checkbox-custom .checkbox:after, .customer-language .checkbox:after {
-  width: 8px;
-  height: 14px;
-  border: solid;
-  border-width: 0 3px 3px 0;
-  transform: rotate(35deg);
-}
-
 .customer-language {
   display: block;
   margin: 14px 0 0 5px;
-}
-
-.buttons-box {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 20px;
-  padding: 0 15px 0 0;
-}
-.buttons-box .select {
-  width: 184px;
-  height: 26px;
-  padding-top: 2px;
-  margin: 0 45px 0 15px;
-}
-.buttons-box .save {
-  margin-left: 10px;
-}
-.buttons-box .cancel {
-  margin: 0 10px 0 15px;
-}
-
-.tooltip {
-  color: #5e7081;
-  margin-left: 10px;
-  font-size: 17px;
-  line-height: 0;
 }
 
 .devices-list {
@@ -900,7 +829,7 @@ button.service-top-menu:hover {
   outline: 0;
 }
 .solutions-list .input-edit:hover, .solutions-list .input-edit:focus {
-  border: #224561 1px solid;
+  border: #546776 1px solid;
   border-color: #2d9acf;
   box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.008), 0px 0px 8px rgba(121, 181, 231, 0.75);
   outline: 0;

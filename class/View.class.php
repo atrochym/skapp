@@ -1,7 +1,7 @@
 <?php
 
-class View {
-
+class View
+{
 	private $message;
 	private $views = [];
 	private $renderData = [];
@@ -18,11 +18,15 @@ class View {
 	}
 
 
-	public function joinCSS($resource) {
+	public function addCSS($resource)
+	{
 		$this->resourcesCSS[] = $resource;
 	}
 	
-	public function joinJS($resource) {
+	public function addJS($resource, $module = false)
+	{
+		$resource = ['file' => $resource];
+		$resource += $module ? ['module' => 'type="module"'] : ['module' => null];
 		$this->resourcesJS[] = $resource;
 	}
 

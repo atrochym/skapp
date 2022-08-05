@@ -560,3 +560,45 @@ button.service-top-menu:hover
 
 .hidden
 	display: none !important
+
+.checkbox-custom
+	cursor: pointer
+	user-select: none
+	margin-right: 10px
+	vertical-align: middle
+	display: inline-block
+	
+	input
+		display: none
+	
+	/* Create a custom checkbox */
+	.checkbox 
+		display: block
+		width: 25px
+		height: 24px
+		background-color: c.$inputBgColor
+		border-radius: 4px
+		border: solid 1px c.$inputBorderColor
+		padding: 3px 8px
+
+	/* Create the checkmark/indicator (hidden when not checked) */
+	.checkbox:after 
+		content: ""
+		display: none
+
+	/* On mouse-over, add a grey background color */
+	&:hover input ~ .checkbox 
+		border-color: #66AFE9
+		box-shadow: inset 0px 1px 1px rgba(0,0,0,0.075), 0px 0px 8px rgba(102,175,233,0.70)
+
+	/* Show the checkmark when checked */
+	input:checked ~ .checkbox:after 
+		display: block
+	
+	/* Style the checkmark/indicator */
+	.checkbox:after 
+		width: 8px
+		height: 14px
+		border: solid
+		border-width: 0 3px 3px 0
+		transform: rotate(35deg)

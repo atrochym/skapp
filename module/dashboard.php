@@ -1,6 +1,6 @@
 <?php
 
 echo ('TODO::dashboard');
-$view->joinCSS('main');
+$view->addCSS('main');
 
 $view->render();

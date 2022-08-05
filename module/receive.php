@@ -44,8 +44,8 @@ if ($action == 'create' && $_SERVER['REQUEST_METHOD'] == 'POST')
 	$router->redirect('back');
 }
 
-$view->joinCSS('receive');
-$view->joinCSS('device');
+$view->addCSS('receive');
+// $view->addCSS('device');
 
 $receive = new Receive($db);
 $receive->setReceiveId($receiveId);
@@ -285,10 +285,10 @@ $view->addView('receive-assign-part');
 
 
 //////////////////////////////////
-$view->joinJS('receive');
-$view->joinJS('device');
-$view->joinCSS('note');
-$view->joinJS('note');
+$view->addJS('receive', true);
+// $view->addJS('device');
+$view->addCSS('note');
+$view->addJS('note');
 
 
 $view->render();

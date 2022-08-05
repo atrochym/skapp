@@ -2,7 +2,7 @@
 
 $customerId = $router->getId();
 
-$view->joinCSS('customer');
+$view->addCSS('customer');
 
 
 if ($action == 'create')
@@ -128,8 +128,8 @@ elseif ($action == 'list')
 
 	if ($result)
 	{
-		$view->joinCSS('receive'); // ogarnąć, wyodrębnić
-		$view->joinCSS('device');
+		$view->addCSS('receive'); // ogarnąć, wyodrębnić
+		$view->addCSS('device');
 		$view->addData(['customers' => $result]);
 		$view->addView('customer-list');
 		$view->render();
@@ -203,7 +203,7 @@ foreach ($devices as $device)
 	}
 }
 
-$view->joinCSS('receive');
+$view->addCSS('receive');
 
 $view->addData($customerData);
 $view->addData(['devices' => $devices]);

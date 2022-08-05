@@ -3,7 +3,10 @@
 $serviceId = $router->getId();
 
 $service = new Service($db);
-$service->setServiceId($serviceId);
+if ($serviceId)
+{
+	$service->setServiceId($serviceId);
+}
 
 if ($action == 'assign-part')
 {
@@ -135,6 +138,7 @@ elseif ($action == 'set-worker')
 elseif ($action == 'test')
 {
 	$input = $router->requestJson();
+	// $input['name'] = 'cpz';
 
 	$validate = new Validate;
 	$validate->add('name', $input['name'], 'text require 3 100');
@@ -155,8 +159,9 @@ elseif ($action == 'test')
 
 		$values = [
 			'name' => '%'.$validate->name.'%',
+			'tag' => '%'.$validate->name.'%',
 		];
-		$response['data'] = $db->run('SELECT * FROM services_names WHERE name LIKE :name', $values)->fetchAll();
+		$response['data'] = $db->run('SELECT * FROM services_names WHERE name LIKE :name OR tags LIKE :tag', $values)->fetchAll();
 		$response['success'] = true;
 
 	}

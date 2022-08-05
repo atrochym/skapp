@@ -122,12 +122,12 @@ class Router {
 		{
 			$this->errorPage(403);
 		}
-		$date = makeDate();
+		// $date = makeDate();
 
-		if ($date != $res['date'])
-		{
-			$this->errorPage(403);
-		}
+		// if ($date <= $res['date'])
+		// {
+		// 	$this->errorPage(403);
+		// }
 
 		$this->id = $res['id'];
 	}

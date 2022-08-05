@@ -88,29 +88,47 @@
 	</div>
 	<div class="content-box valuation-box">
 		<h2 class="title">Zaproponowane rozwiązania</h2>
-		<div class="solution-area">
+		<div class="solutions-list" data-id="0" data-count="0">
 			<h2 class="label label-small" style="width: 322px;">Rodzaj
 				<i class="tooltip fa fa-question-circle" title="• Dla oferty z GROUPON'u wpisz: &#013;groupon kod_grouponu&#013;Kwota nie jest wymagana."></i>
 			</h2>
 			
 			<h2 class="label label-small">Koszt</h2>
-			<div class="solution-box" data-id="0">
-				<div class="row">
-					<input class="input solution" type="text" name="solution[0][name]">
-					<input class="input price" type="text" name="solution[0][price]">
-					
-					<i class="remove fa fa-times"></i>
+			<!-- <div class="solution-item" data-id="0"> -->
+			<div class="row template hidden">
+				<input class="input input-name solution" type="text" name="" autocomplete="off">
+				<span class="char-count">3</span>
+				<input class="input input-cost" type="text" name="" pattern="\d+-?\d*" title="Wpisz cenę lub przedział cenowy z myślnikiem." autocomplete="off">
+				<div class="prompt-box hidden">
+					<div class="element template" tabindex="1">
+						<span class="name"></span>
+						<span class="price"></span>
+					</div>
 				</div>
+				<i class="remove fa fa-times"></i>
 			</div>
+			<div class="row">
+				<input class="input input-name solution" type="text" name="solution[0][name]" required autocomplete="off">
+				<span class="char-count">3</span>
+				<input class="input input-cost" type="text" name="solution[0][price]" pattern="\d+-?\d*" title="Wpisz cenę lub przedział cenowy z myślnikiem." autocomplete="off" required>
+				<div class="prompt-box hidden">
+					<div class="element" tabindex="1">
+						<span class="name"></span>
+						<span class="price"></span>
+					</div>
+				</div>
+				<i class="remove fa fa-times"></i>
+			</div>
+			<!-- </div> -->
 
-			<div class="empty">
-				<i class="add fa fa-plus"></i>
+			<div class="buttons">
+				<i class="add-solution-btn fa fa-plus"></i>
 			</div>
 		</div>
 		
 		<div class="price-area">
 			<h2 class="label label-small">RAZEM</h2>
-			<span class="price-total">-</span>		
+			<span class="price-total">-</span>
 		</div>
 		<div class="advance-area">
 			<h2 class="label label-small advance-area">Wpłata zaliczki</h2>

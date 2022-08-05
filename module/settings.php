@@ -1,6 +1,6 @@
 ﻿<?php
 
-$view->joinCSS('settings');
+$view->addCSS('settings');
 
 if ($action == 'redir') {
 
@@ -39,7 +39,7 @@ foreach ($data['workers'] as $key => $worker)
 $view->addData($data);
 $view->addView('settings');
 
-$view->joinJS('settings');
+$view->addJS('settings');
 
 $trustedDeviceRequests = $db->run(
 	'SELECT wd.*, w.name AS workerName FROM workers_devices AS wd

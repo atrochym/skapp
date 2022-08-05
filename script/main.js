@@ -1,63 +1,71 @@
-﻿
-
-$("#add-button").click(function() {
-	numberOfSolutions = parseInt($("#numberOfSolutions").val());
-	numberOfSolutions ++;
-	var newdiv = `<div id="solution-%" style="width:auto;display: flex; justify-items: center;margin-bottom: 10px;">
-					<input type="hidden" id="changed-%" name="solution[%][changed]" value="1">
-					<input type="hidden" name="solution[%][id]" value="0">
-					<input type="text" class="form-input input-form2 name" name="solution[%][name]" style="width: 405px;" placeholder="nazwa" value="">
-					<input type="text" id="price-%" class="form-input input-form2 price" name="solution[%][price]" style="width: 100px;margin-left: 40px;" placeholder="cena" value="">
-						<select id="select-%" name="solution[%][worker_id]" size="1" class="input-form2" style="display:none;width:184px;height:24px;padding-top: 2px;margin-left: 20px;">
-							<option value="0">-</option>
-							// js genering
-						</select>
-						<button id="who-%" type="button" class="who fa fa-user-circle service-form-icon" style=" font-size: 18px;"></button>
-						<button id="remove-%" type="button" class="fa fa-minus-circle service-form-icon" style=""></button>
-						<button class="fa fa-check-circle service-form-icon" type="button" style="color:#008B8B;display:none;"></button>
-					</div>`;
-
-	newdiv = newdiv.replaceAll("%", `${numberOfSolutions}`);
-	$("#solution-list-form div:last").after(newdiv);
-	$("#numberOfSolutions").val(numberOfSolutions);
-	$(`#select-${numberOfSolutions}`).append(selectWorkersList(workersListfromPHP));
-	createListeners(numberOfSolutions);
-
-	$(`[id^=remove-${numberOfSolutions}`).click(function() {
-		$(this).parent().remove();
-		newPrice();
-	});
-
-});
-
-function createListeners(value='') {
-	// listenery dla wszystkich solutions
-	$(`[id^=who-${value}`).click(function() {
-		$(this).prev("select").toggle();
-	});
-	
-
-	
-	$(`[id^=price-${value}]`).change(function() {
-		newPrice();    
-	});
-}
-
-
-function checkInputChanges(deviceID, serviceID) {
-	let changes = [];
-	$(`[id^=changed-]`).each(function() {
-		changes.push($(this).val());
-	});
-	if(changes.includes('1')) {
-		xx = confirm("Studio-Komp -- ostrzeżenie \n\n  Masz niezapisane zmiany w formularzu. \n\n  Kliknij OK żeby kontynuować lub anuluj by pozostać.");
-		if(xx) {
-			location.href=`/sk/device/${deviceID}/mark-done/service-${deviceID}`;
-		}
-	} else {
-		location.href=`/sk/device/${deviceID}/mark-done/service-${deviceID}`;
+﻿document.addEventListener('keyup', e => {
+	if (e.key == 'n' && e.altKey) {
+		document.location = '/sk/customer/register';
 	}
-}
+
+	if (e.key == 'l' && e.altKey) {
+		document.location = '/sk/account/logout';
+	}
+})
+
+// $("#add-button").click(function() {
+// 	numberOfSolutions = parseInt($("#numberOfSolutions").val());
+// 	numberOfSolutions ++;
+// 	var newdiv = `<div id="solution-%" style="width:auto;display: flex; justify-items: center;margin-bottom: 10px;">
+// 					<input type="hidden" id="changed-%" name="solution[%][changed]" value="1">
+// 					<input type="hidden" name="solution[%][id]" value="0">
+// 					<input type="text" class="form-input input-form2 name" name="solution[%][name]" style="width: 405px;" placeholder="nazwa" value="">
+// 					<input type="text" id="price-%" class="form-input input-form2 price" name="solution[%][price]" style="width: 100px;margin-left: 40px;" placeholder="cena" value="">
+// 						<select id="select-%" name="solution[%][worker_id]" size="1" class="input-form2" style="display:none;width:184px;height:24px;padding-top: 2px;margin-left: 20px;">
+// 							<option value="0">-</option>
+// 							// js genering
+// 						</select>
+// 						<button id="who-%" type="button" class="who fa fa-user-circle service-form-icon" style=" font-size: 18px;"></button>
+// 						<button id="remove-%" type="button" class="fa fa-minus-circle service-form-icon" style=""></button>
+// 						<button class="fa fa-check-circle service-form-icon" type="button" style="color:#008B8B;display:none;"></button>
+// 					</div>`;
+
+// 	newdiv = newdiv.replaceAll("%", `${numberOfSolutions}`);
+// 	$("#solution-list-form div:last").after(newdiv);
+// 	$("#numberOfSolutions").val(numberOfSolutions);
+// 	$(`#select-${numberOfSolutions}`).append(selectWorkersList(workersListfromPHP));
+// 	createListeners(numberOfSolutions);
+
+// 	$(`[id^=remove-${numberOfSolutions}`).click(function() {
+// 		$(this).parent().remove();
+// 		newPrice();
+// 	});
+
+// });
+
+// function createListeners(value='') {
+// 	// listenery dla wszystkich solutions
+// 	$(`[id^=who-${value}`).click(function() {
+// 		$(this).prev("select").toggle();
+// 	});
+	
+
+	
+// 	$(`[id^=price-${value}]`).change(function() {
+// 		newPrice();    
+// 	});
+// }
+
+
+// function checkInputChanges(deviceID, serviceID) {
+// 	let changes = [];
+// 	$(`[id^=changed-]`).each(function() {
+// 		changes.push($(this).val());
+// 	});
+// 	if(changes.includes('1')) {
+// 		xx = confirm("Studio-Komp -- ostrzeżenie \n\n  Masz niezapisane zmiany w formularzu. \n\n  Kliknij OK żeby kontynuować lub anuluj by pozostać.");
+// 		if(xx) {
+// 			location.href=`/sk/device/${deviceID}/mark-done/service-${deviceID}`;
+// 		}
+// 	} else {
+// 		location.href=`/sk/device/${deviceID}/mark-done/service-${deviceID}`;
+// 	}
+// }
 
 
 //listener usuwający wywalić z obiektów z bazy
@@ -98,11 +106,15 @@ function selectWorkersList(workersListfromPHP) {
 
 
 // newPrice();
-createListeners();
+// createListeners();
 
 function cl(value) {
 	console.log(value);
 	
+}
+
+const ct = (value) => {
+	console.table(value);
 }
 
 function assignPart($serviceId) {

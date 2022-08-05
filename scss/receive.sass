@@ -36,6 +36,117 @@ $labelGray: #B2B2B2
 		@extend .label
 		color: $labelGray
 
+.top-menu
+	display: flex
+	justify-content: space-between
+	background-color: #2E373F
+	width: 100%
+	margin-bottom: 30px
+	// cursor: pointer
+
+	.button-m
+		display: inline-block
+		padding: 9px 20px 9px 15px
+
+		&:hover
+			background-color: #005279
+		
+
+	.ico
+		margin: 0 10px 0 0
+		font-size: 16px
+
+	.right-ico
+		font-size: 16px
+		// color: #005279
+		margin: 0 12px 0 0
+
+
+	.right-field
+		display: inline-block
+		font-size: 12px
+		font-weight: bold
+		padding: 9px 15px 9px 10px
+
+.issue-box
+	// padding: 0 28px 20px 28px
+	text-align: left
+	width: 100%
+
+
+
+.notice-box
+	padding: 0 28px
+
+
+
+
+.history
+	// dwa poniższe nadpisują
+	// dla animacji
+	padding-bottom: 0	
+	.title
+		padding-bottom: 15px
+
+
+.history-list
+	width: 100%
+	text-align: left
+	border-spacing: 0 5px
+
+
+	//!!! TODO odstęp wierszy bo na
+	// row to nie działa xD
+	.row
+
+		&:hover
+			background-color: #005279
+
+	td
+		// padding-left: 4px
+		padding: 5px 0 5px 4px
+		
+	
+	.kek
+		padding-left: 24px
+
+	// .col
+
+	.col1
+		width: 75px
+		padding-left: 28px
+
+	.col2
+		// width: 100%
+
+	.col3
+		width: 110px
+		color: $labelGray
+		font-size: 12px
+
+
+.animate
+	// max-height: 0
+	// transition: max-height 0.8s ease
+	// overflow: hidden
+	width: inherit
+
+.ico-test
+	border: 1px #546776 solid
+	border-radius: 3px
+	text-align: center
+	width: 24px
+	// padding: 3px 0
+	font-size: 16px
+	position: absolute
+	top: 8px
+	right: 16px
+	padding: 1px 0 5px 0
+	transition-duration: 0.5s
+
+	&-rotate
+		transform: rotate(180deg)
+		
 // .content-boxee
 // 	position: relative
 // 	display: flex
@@ -66,147 +177,156 @@ $labelGray: #B2B2B2
 	padding: 4px
 
 
-.issue-box 
-	align-content: flex-start
-	max-width: 825px
-	margin-right: 5px
+// .issue-box 
+// 	align-content: flex-start
+// 	max-width: 825px
+// 	margin-right: 5px
 
-	&-input-notice
-		width: 285px
+// 	&-input-notice
+// 		width: 285px
 	
-	.column-1
-		padding-left: 28px
+// 	.column-1
+// 		padding-left: 28px
 
-	.column-2
-		padding-left: 45px
+// 	.column-2
+// 		padding-left: 45px
 
-	.password
-		display: inline-block
-		width: 320px
-		margin: 0 0 0 15px
+// 	.password
+// 		display: inline-block
+// 		width: 320px
+// 		margin: 0 0 0 15px
 
-	.horizontal
-		margin: 0 0 20px 0
-		display: block
+// 	.horizontal
+// 		margin: 0 0 20px 0
+// 		display: block
 
-	.prediction
-		display: inline-block
-		margin: 0 0 0 15px
-		padding: 2px 0 3px 4px
-		height: 25px
+// 	.prediction
+// 		display: inline-block
+// 		margin: 0 0 0 15px
+// 		padding: 2px 0 3px 4px
+// 		height: 25px
 
-		&-date
-			width: 135px
+// 		&-date
+// 			width: 135px
 
-		&-time
-			width: 80px
+// 		&-time
+// 			width: 80px
 
-.input-box 
-	@extend .input-new
-	margin-left: 5px
-	margin-top: 14px
-	resize: vertical
-	min-height: 70px
-	max-height: 150px
+// .input-box 
+// 	@extend .input-new
+// 	margin-left: 5px
+// 	margin-top: 14px
+// 	resize: vertical
+// 	min-height: 70px
+// 	max-height: 150px
 
-	&-issue 
-		width: 420px
-	
-
-	&-notice 
-		width: 282px
+// 	&-issue 
+// 		width: 420px
 	
 
-
-.valuation-box 
-	margin-right: 5px
-	align-content: flex-start
-
-	.solution-area 
-		width: 610px
-		padding-left: 28px	
-
-	.solution 
-		display: inline-block
-		width: 300px
-		vertical-align: middle	
-
-	.price 
-		width: 105px
-		display: inline-block
-		vertical-align: middle
-		margin-left: 20px	
-
-	.remove 
-		font-size: 22px
-		color: #546776
-		padding-left: 20px
-		margin-top: 10px
-		vertical-align: middle
-
-		&-deny
-			@extend .remove
-
-
-	.add 
-		font-size: 21px
-		color: #308B9E
-		padding-left: 20px
-		margin-top: 11px
-		vertical-align: middle	
-
-	.empty 
-		padding-left: 439px
-		padding-top: 4px	
-
-
-.price-area 
-	width: 245px
-
-	.price-total 
-		font-weight: bold
-		padding: 14px 0 0 8px
-		display: block
-		font-size: 14px
+// 	&-notice 
+// 		width: 282px
 	
 
 
-.advance-area 
-	display: block
+// .valuation-box
+// 	margin-right: 5px
+// 	align-content: flex-start
 
-	.advance-input 
-		width: 125px
-		vertical-align: middle
-		display: inline-block
+// 	.solutions-list
+// 		width: 610px
+// 		padding-left: 28px	
 
-	.erase
-		font-size: 22px
-		color: #546776
-		padding-left: 20px
-		margin-top: 10px
-		vertical-align: middle
+// 	.solution
+// 		display: inline-block
+// 		width: 290px
+// 		vertical-align: middle
+
+// 	.input-cost
+// 		width: 102px
+// 		display: inline-block
+// 		vertical-align: middle
+// 		margin-left: 17px
+
+// 	.remove 
+// 		font-size: 22px
+// 		color: #546776
+// 		padding-left: 20px
+// 		// margin-top: 10px
+// 		vertical-align: middle
+
+// 		&-deny
+// 			@extend .remove
+
+// 	.row
+// 		position: relative
+// 		width: 460px
+// 		margin-top: 8px
 
 
-.options-box 
-	width: 250px 
-	flex-direction: column
-	padding: 20px 0 0 20px 
+// 	.add-solution-btn
+// 		font-size: 21px
+// 		color: #308B9E
+// 		padding-left: 20px
+// 		margin-top: 11px
+// 		vertical-align: middle
 
-	.field
-		margin: 0 0 22px 0
+// 	.buttons 
+// 		padding-left: 418px
+// 		padding-top: 2px
+
+// 	.char-count
+// 		top: 5px
+// 		right: 178px
 
 
+// .price-area 
+// 	width: 245px
 
-.field 
-	width: 260px
-
-	&-first 
-		width: 260px
-		margin-left: 28px
+// 	.price-total 
+// 		font-weight: bold
+// 		padding: 14px 0 0 8px
+// 		display: block
+// 		font-size: 14px
 	
 
-	&-last 
-		width: 220px
+
+// .advance-area 
+// 	display: block
+
+// 	.advance-input 
+// 		width: 125px
+// 		vertical-align: middle
+// 		display: inline-block
+
+// 	.erase
+// 		font-size: 22px
+// 		color: #546776
+// 		padding-left: 20px
+// 		margin-top: 10px
+// 		vertical-align: middle
+
+
+// .options-box 
+// 	width: 250px 
+// 	flex-direction: column
+// 	padding: 20px 0 0 20px 
+
+// 	.field
+// 		margin: 0 0 22px 0
+
+
+
+// .field 
+// 	width: 260px
+
+// 	&-first 
+// 		width: 260px
+// 		margin-left: 28px
+	
+
+// 	&-last 
+// 		width: 220px
 
 
 .input 
@@ -224,72 +344,72 @@ $labelGray: #B2B2B2
 	background-color: #376FB3
 
 
-.checkbox-custom
-	cursor: pointer
-	user-select: none
-	margin-right: 10px
-	vertical-align: middle
-	display: inline-block
+// .checkbox-custom
+// 	cursor: pointer
+// 	user-select: none
+// 	margin-right: 10px
+// 	vertical-align: middle
+// 	display: inline-block
 	
-	input
-		display: none
+// 	input
+// 		display: none
 	
-	/* Create a custom checkbox */
-	.checkbox 
-		display: block
-		width: 25px
-		height: 24px
-		background-color: $inputColor
-		border-radius: 4px
-		border: solid 1px $borderColor
-		padding: 3px 8px
+// 	/* Create a custom checkbox */
+// 	.checkbox 
+// 		display: block
+// 		width: 25px
+// 		height: 24px
+// 		background-color: $inputColor
+// 		border-radius: 4px
+// 		border: solid 1px $borderColor
+// 		padding: 3px 8px
 
-	/* Create the checkmark/indicator (hidden when not checked) */
-	.checkbox:after 
-		content: ""
-		display: none
+// 	/* Create the checkmark/indicator (hidden when not checked) */
+// 	.checkbox:after 
+// 		content: ""
+// 		display: none
 
-	/* On mouse-over, add a grey background color */
-	&:hover input ~ .checkbox 
-		border-color: #66AFE9
-		box-shadow: inset 0px 1px 1px rgba(0,0,0,0.075), 0px 0px 8px rgba(102,175,233,0.70)
+// 	/* On mouse-over, add a grey background color */
+// 	&:hover input ~ .checkbox 
+// 		border-color: #66AFE9
+// 		box-shadow: inset 0px 1px 1px rgba(0,0,0,0.075), 0px 0px 8px rgba(102,175,233,0.70)
 
-	/* Show the checkmark when checked */
-	input:checked ~ .checkbox:after 
-		display: block
+// 	/* Show the checkmark when checked */
+// 	input:checked ~ .checkbox:after 
+// 		display: block
 	
-	/* Style the checkmark/indicator */
-	.checkbox:after 
-		width: 8px
-		height: 14px
-		border: solid
-		border-width: 0 3px 3px 0
-		transform: rotate(35deg)
+// 	/* Style the checkmark/indicator */
+// 	.checkbox:after 
+// 		width: 8px
+// 		height: 14px
+// 		border: solid
+// 		border-width: 0 3px 3px 0
+// 		transform: rotate(35deg)
 
 .customer-language
 	@extend .checkbox-custom
 	display: block
 	margin: 14px 0 0 5px
 
-.buttons-box
-	display: flex
-	justify-content: flex-end
-	// margin-top: 30px
-	margin-top: 20px
-	padding: 0 15px 0 0
+// .buttons-box
+// 	display: flex
+// 	justify-content: flex-end
+// 	// margin-top: 30px
+// 	margin-top: 20px
+// 	padding: 0 15px 0 0
 
 
-	.select
-		width: 184px
-		height: 26px
-		padding-top: 2px
-		margin: 0 45px 0 15px
+// 	.select
+// 		width: 184px
+// 		height: 26px
+// 		padding-top: 2px
+// 		margin: 0 45px 0 15px
 
-	.save
-		margin-left: 10px
+// 	.save
+// 		margin-left: 10px
 	
-	.cancel
-		margin: 0 10px 0 15px
+// 	.cancel
+// 		margin: 0 10px 0 15px
 
 // .devices-list-box
 // 	display: flex
@@ -305,11 +425,11 @@ $labelGray: #B2B2B2
 // 	.device
 // 		margin: 0 0 0 10px
 
-.tooltip
-	color: #5e7081
-	margin-left: 10px
-	font-size: 17px
-	line-height: 0
+// .tooltip
+// 	color: #5e7081
+// 	margin-left: 10px
+// 	font-size: 17px
+// 	line-height: 0
 
 
 

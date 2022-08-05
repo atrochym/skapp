@@ -372,7 +372,7 @@ function parseUserAgent(string $userAgent = null)
 		$platform = isset($match[0]) && isset($userAgentDB['windowsOS'][$match[0]]) ? $userAgentDB['windowsOS'][$match[0]] : end($userAgentDB['windowsOS']);
 
 	}
-	elseif (str_contains($userAgentLower, 'like mac os x') || str_contains($userAgentLower, 'ios'))
+	elseif (str_contains($userAgentLower, 'like mac os x') || str_contains($userAgentLower, 'ios '))
 	{
 		$timer->start('platform');
 
@@ -395,7 +395,7 @@ function parseUserAgent(string $userAgent = null)
 		$platform = isset($match[0]) && isset($userAgentDB['macOS'][$match[0]]) ? $userAgentDB['macOS'][$match[0]] : end($userAgentDB['macOS']);
 
 	}
-	elseif (str_contains($userAgentLower, 'android'))
+	elseif (str_contains($userAgentLower, 'android') && !str_contains($userAgentLower, 'kaios'))
 	{
 		$timer->start('platform');
 
@@ -406,7 +406,7 @@ function parseUserAgent(string $userAgent = null)
 		$platform = isset($match[0]) && isset($userAgentDB['androidOS'][$match[0]]) ? $userAgentDB['androidOS'][$match[0]] : end($userAgentDB['androidOS']);
 
 	}
-	elseif (str_contains($userAgentLower, 'linux'))
+	elseif (str_contains($userAgentLower, 'linux') || str_contains($userAgentLower, 'kaios'))
 	{
 		$timer->start('platform');
 
@@ -573,7 +573,7 @@ function checkAuth(Database $db, $auth): bool
 
 		if ($workerId)
 		{
-			$randHex = substr($auth, 20);
+			$randHex = substr($auth, 25);
 			$rand = hexdec($randHex);
 			$worker = $db->run('SELECT login, security_token FROM workers WHERE id = :id LIMIT 1', $workerId)->fetch();
 
@@ -710,7 +710,8 @@ function url(string $url): string
 	// }
 
 	$workerId = getFromSession('workerId');
-	$date = makeDate();
+	// $date = makeDate();
+	$date = '362215'; // ogarnąć obliczanie daty
 	$rand = random_int(256, 4095);
 
 	$randHex = str_split(dechex($rand));

@@ -4,10 +4,14 @@ RewriteBase /sk/
 
 <Files *.php>
 	Order Deny,Allow
-#	Deny from all
+	Deny from all
 	Allow from 192.168.0.1
 </Files>
 <Files index.php>
+	Order Allow,Deny
+	Allow from all
+</Files>
+<Files tests.php>
 	Order Allow,Deny
 	Allow from all
 </Files>

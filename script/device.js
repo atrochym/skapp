@@ -1,3 +1,338 @@
+import {removeSolution, addSolution, countCost, hidePromptBox, startPromptBox} from './solution.js';
+
+const solutionsList = document.querySelector('.solutions-list');
+const priceHandler = '.solutions-list .input-cost';
+const priceResultHandler = '.price-total';
+
+solutionsList.addEventListener('click', e => {
+	const target = e.target;
+
+	if (target.classList.contains('add-solution-btn')) {
+		addSolution(solutionsList);
+
+	} else if (e.target.classList.contains('remove')) {
+		solutionsList.dataset.count > 0 && removeSolution(e.target);
+	}
+
+	if (e.target.closest('.element')) {
+		const row = e.target.closest('.row');
+		const promptBox = row.querySelector('.prompt-box');
+		const inputName = row.querySelector('.input-name');
+		const inputPrice = row.querySelector('.input-cost');
+		const element = e.target.closest('.element');
+		const name = element.querySelector('.name').textContent;
+		const price = element.querySelector('.price').textContent;
+
+		inputName.value = name;
+		inputPrice.value = price;
+		toggleVisible(promptBox);
+
+
+
+	}
+
+	if (e.target.classList.contains('input-name')) {
+		const row = e.target.closest('.row');
+		const promptBox = row.querySelector('.prompt-box');
+		const promptBoxOpened = document.querySelector('.visible');
+
+		if (promptBoxOpened) {
+			// promptBoxOpened.classList.add('hidden');
+			toggleVisible(promptBoxOpened);
+			promptBoxOpened.classList.remove('visible');
+		}
+
+		if (promptBox.dataset.response == "true")
+		{
+			promptBox.classList.remove('hidden');
+			promptBox.classList.add('visible');
+		}
+		// promptBoxOpened && promptBoxOpened.classList.remove('.visible');
+
+		// promptBox.classList.remove('hidden');
+		// promptBox.classList.add('visible');
+
+	}
+
+});
+
+function _addSolution() {
+	const solutionsArea = document.querySelector('.solution-area');
+	const serviceId = ++solutionsArea.dataset.id;
+	// const solutionsCount = ++solutionsArea.dataset.count;
+	const newSolutionRow = document.querySelector('.row').cloneNode(true);
+
+	const [inputName, inputPrice] = newSolutionRow.querySelectorAll('input');
+	inputName.name = `solution[${serviceId}][name]`;
+	inputName.value = '';
+	inputPrice.name = `solution[${serviceId}][price]`;
+	inputPrice.value = '';
+	// toggleVisible(newSolutionRow);  // jakoś nie działa o.O
+	newSolutionRow.classList.remove('hidden');
+	buttons = solutionsArea.querySelector('.buttons');
+	buttons.before(newSolutionRow);
+	
+	// buttons.querySelector('.solution-save-btn').classList.remove('hidden');
+	inputName.focus();
+
+	// ++solutionsTable.dataset.id;
+	// ++solutionsTable.dataset.count;
+
+	/// ogarnąć przycisk anulowania, zapisania, zliczania kwoty itp
+	// mimo focusu po odkliknięciu ucieka lista podpowiedzi
+}
+
+document.addEventListener('click', e => {
+	if(document.querySelector('.visible') == null || e.target.closest('.input-name'))
+		return;
+
+	hidePromptBox();
+
+})
+
+function _deleteRow(element) {
+	solutionsTable = document.querySelector('.solutions-area');
+
+	element.closest('.row').remove();
+	// --solutionsTable.dataset.count;
+	// if(solutionsTable.dataset.count == 0) {
+	// 	toggleVisible(document.querySelector('.solution-save-btn'));
+	// }
+	recountCost();
+}
+
+
+
+
+// skopiowane z receive
+
+function _hidePromptBox() {
+	const element = document.querySelector('.visible');
+	element.classList.add('hidden');
+	element.classList.remove('visible');
+	element.querySelector('.selected') && element.querySelector('.selected').classList.remove('selected');
+}
+
+function _recountCost() {
+	let priceMin = 0;
+	let priceMax = 0;
+
+	document.querySelectorAll('.solution-area .input-cost').forEach(element => {
+		let thisPrice = element.value;
+
+		if (thisPrice.indexOf('-') != -1) {
+			thisPrice = thisPrice.replaceAll(' ', '');
+			period = thisPrice.split('-').sort();
+			periodMin = parseInt(period[0]);
+			periodMax = parseInt(period[1]);
+			if (Number.isNaN(periodMin)) {
+				periodMin = 0;
+			}
+			if (Number.isNaN(periodMax)) {
+				periodMax = 0;
+			}
+			thisPrice = 0;
+		} else {
+			thisPrice = parseInt(thisPrice);
+			periodMin = 0;
+			periodMax = 0;
+			if (Number.isNaN(thisPrice)) {
+				thisPrice = 0;
+			}
+		}
+		priceMin = priceMin + thisPrice + periodMin;
+		priceMax = priceMax + thisPrice + periodMax;
+
+	});
+
+	if(priceMin !== priceMax) {
+		priceMin = priceMin + ' - ' + priceMax;
+	}
+
+	document.querySelector('.price-total').textContent = priceMin + ' PLN';
+}
+
+async function _test(string, item) {
+	const name = string;
+
+	const data = {
+		'name': name,
+	}
+
+	const fetch = await fetchData('/sk/service/test/json', data);
+
+	if (!fetch || !fetch.success) {
+		showMessageBox('warn::Błąd podczas aktualizacji usługi.');
+		return;
+	}
+
+	// ustalić do którego promptboxa mają wpadać elementy - OK
+	// pomyśleć o pobraniu danych i filtrowaniu locala? - 
+	// przejście na listę strzałką w dół
+	// po kliknięciu w wypełniony input przywrócić listę ostatnich wyników
+
+	const services = fetch.data;
+	
+
+	const promptBox = item.querySelector('.prompt-box');
+	promptBox.classList.remove('hidden');
+	promptBox.classList.add('visible');
+
+	// promptBox.innerHTML = '';
+
+	if (services.length == 0) {
+		a = document.createElement('span');
+		a.classList.add('empty-result');
+		a.textContent = 'Brak wyników';
+		promptBox.appendChild(a);
+
+		return;
+	}
+	
+	// const promptBox = document.querySelector('.prompt-box');
+	// const promptBox = item.querySelector('.prompt-box');
+	// promptBox.classList.remove('hidden');
+	// promptBox.classList.add('visible');
+
+
+	// const promptBox = inputName.nextElementSibling;
+	
+	// const template =  document.querySelector('.prompt-box .element').cloneNode(true);
+	let count = 0;
+	services.forEach(element => {
+		count++;
+		const template =  document.querySelector('.prompt-box .template').cloneNode(true);
+		template.classList.remove('template');
+		template.classList.add('element');
+		template.querySelector('.name').textContent = element.name;
+		template.querySelector('.price').textContent = element.price;
+		template.dataset.id = count;
+		// template = document.createElement('div');
+		// template.classList.add('element');
+		
+		promptBox.appendChild(template);
+		// return template;
+		// cl(inputName);
+	});
+
+	promptBox.dataset.response = true;
+
+
+}
+
+solutionsList.addEventListener('keyup', e => {
+	if (e.target.classList.contains('input-cost')) {
+		countCost(priceHandler, priceResultHandler);
+	}
+
+	if (e.target.classList.contains('input-name')) {
+		startPromptBox(e);
+	}
+});
+
+solutionsList.addEventListener('keydown', e => {
+	const inputName = e.target;
+
+	const item = e.target.closest('.row');
+	if (!item) return;
+	let element, allElements, promptBox;
+
+	if (item.querySelector('.prompt-box')) {
+		promptBox = item.querySelector('.prompt-box');
+		element = promptBox.querySelector('.selected');
+		allElements = promptBox.querySelectorAll('.element').length;
+	}
+
+	// cl (allElements);
+
+
+
+	if (e.key == 'ArrowDown' && allElements) {
+		e.preventDefault();
+		// let next = element.nextElementSibling;
+
+		if (element) {
+			if (element.dataset.id == allElements) {
+				return
+			}
+			element.classList.remove('selected');
+			element.nextElementSibling.classList.add('selected');
+			element.nextElementSibling.focus();
+		}
+		else
+		{
+			let element = promptBox.querySelector('.element');
+			element.classList.add('selected');
+			element.focus();
+		}
+		// promptBox.querySelector('.element').focus();
+	} else if (e.key == 'ArrowUp') {
+		e.preventDefault();
+
+		if (element) {
+			if (element.dataset.id == 1) {
+
+				item.querySelector('.input-name').focus();
+				element.classList.remove('selected');
+				return;
+			}
+
+			element.classList.remove('selected');
+			element.previousElementSibling.classList.add('selected');
+			element.previousElementSibling.focus();
+		}
+
+	} else if (e.key == 'Enter') {
+		let element = promptBox.querySelector('.selected');
+		if (element) {
+			element.click();
+			item.querySelector('.input-cost').focus();
+		}
+		e.preventDefault();
+
+	} else if(e.key == 'Delete' && inputName.value.length == 0) {
+		// cl('usunę');
+		solutionsList.dataset.count > 0 && removeSolution(inputName);
+
+	} else if(e.key == 'Delete' && e.shiftKey) {
+		// cl('usunę');
+		solutionsList.dataset.count > 0 && removeSolution(inputName);
+	} else if(e.key == 's' && e.altKey) {
+		cl('usunę');
+		// deleteRow(inputName);
+	} 
+
+});
+
+solutionsList.addEventListener('focusin', e => {
+	const inputName = e.target;
+	if (inputName.classList.contains('input-name') && inputName.value.length < 3) {
+		const charCounter = inputName.nextElementSibling;
+		charCounter.classList.remove('hidden');
+	}
+});
+
+solutionsList.addEventListener('focusout', e => {
+	const inputName = e.target;
+	if (inputName.classList.contains('input-name')) {
+		const charCounter = inputName.nextElementSibling;
+		charCounter.classList.add('hidden');
+	}
+});
+
+document.addEventListener('keyup', e => {
+	if (e.key == 'a' && e.altKey) {
+		addSolution(solutionsList);
+	}
+
+	if (e.key == 'Escape' && document.querySelector('.visible')) {
+		hidePromptBox();
+	}
+})
+
+
+
+
 
 // $(`#part-url`).keyup(function() {
 // 	let url = $(this).val();
@@ -75,100 +410,12 @@ function togglePartAdd() {
 // 	// cl(lol);
 // });
 
-$(".ico-test").click(function() {
-	$(this).siblings('.animate').slideToggle();
-	$(this).toggleClass('ico-test-rotate');
-});
-
-
-// function delrow(element) {
-// 	var solutionsTable = $(".solution-list");
-
-// 	$(element).parents('.row').remove();
-// 	solutionsTable.data('count', --count);
-// 	if(count == 0) {
-// 		$(".save-solution").remove();
-// 	}
-// 	newPrice();
-
-// }
-
-
-
-// function newPrice() {
-// 	let priceMin = 0;
-// 	let priceMax = 0;
-// 	$("input.price").each(function() {
-// 		thisPrice = $(this).val();
-// 		if(thisPrice.indexOf("-") != -1) {
-// 			period = thisPrice.split("-").sort();
-// 			periodMin = parseInt(period[0]);
-// 			periodMax = parseInt(period[1]);
-// 			thisPrice = 0;
-// 		} else {
-// 			thisPrice = parseInt(thisPrice);
-// 			periodMin = 0;
-// 			periodMax = 0;
-// 			if(Number.isNaN(thisPrice)) {
-// 				thisPrice = 0;
-// 			}
-// 		}
-// 		priceMin = priceMin + thisPrice + periodMin;
-// 		priceMax = priceMax + thisPrice + periodMax;
-// 	});
-// 	// ogarnij if w 1 linii
-// 	if(priceMin !== priceMax) {
-// 		priceMin = priceMin + ' - ' + priceMax;
-// 	} 
-	
-// 	$(".price-total").text(priceMin + ' PLN');
-// }
-
-// function createListeners() {
-// 	$(`.price`).change(function() {
-// 		newPrice();
-// 	});
-// }
-
-// newPrice();
-// createListeners();
-
-
-
-// $(".row-edit").click(function() {
-
-// 	var row = $(this).parents('.row');
-	
-
-// 	input = row.find("input");
-
-// 	nameValue = input.eq(0).val();
-// 	priceValue = input.eq(1).val();
-
-// 	input.addClass("input-edit");
-// 	input.removeAttr("disabled");
-// 	input.eq(0).attr("name", "name");
-// 	input.eq(1).attr("name", "price");
-// 	row.find(".action-buttons").toggle();
-// 	row.find(".edit-buttons").toggle();
-
+// $(".ico-test").click(function() {
+// 	$(this).siblings('.animate').slideToggle();
+// 	$(this).toggleClass('ico-test-rotate');
 // });
 
-// $(".row-edit-end").click(function() {
 
-// 	var row = $(this).parents('.row');
-	
-// 	input = row.find("input");
-// 	input.eq(0).val(nameValue);
-// 	input.eq(1).val(priceValue);
-// 	input.removeClass("input-edit");
-// 	input.attr("disabled", true);
-// 	row.find(".action-buttons").toggle();
-// 	row.find(".edit-buttons").toggle();
-
-// 	newPrice();
-
-// });
 
 function testsubmit(id) {
 	var form = $(".form-test");
@@ -185,7 +432,7 @@ function testsubmit(id) {
 
 // }
 
-$(".change-worker-button").click(function() {
+$(".change-worker-button").click(function() {  // używane w receive
 
 	var row = $(this).parents('.row');
 

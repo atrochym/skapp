@@ -26,6 +26,6 @@ $receives = $receives->fetchAll();
 
 // $view = new View('overview-temp', $data);
 $view->addView('overview-temp');
-$view->joinCSS('overview');
+$view->addCSS('overview');
 
 $view->render();

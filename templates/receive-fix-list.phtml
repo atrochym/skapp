@@ -20,12 +20,12 @@ $allowDelete = true;
 				<th class="head-buttons">Akcje</th>
 			</tr>
 			<!-- template hidden-->
-			<tr class="row hidden"> 
+			<tr class="row hidden template"> 
 				<td style="padding-left: 24px; position: relative;" >
 					<input class="input input-name input-edit" name="" value="" autocomplete="off">
 					<span class="char-count hidden">3</span>
 					<div class="prompt-box hidden">
-						<div class="template" tabindex="1">
+						<div class="element template" tabindex="1">
 							<span class="name"></span>
 							<span class="price"></span> zł
 						</div>
@@ -42,7 +42,8 @@ $allowDelete = true;
 			<?php foreach ($services as $service): 
 				$priceTest = 'price';
 
-				switch ($service['status']) {
+				switch ($service['status'])
+				{
 					case 'opened':
 						$status = '-';
 						break;
@@ -67,16 +68,22 @@ $allowDelete = true;
 						$status = 'Unknown';
 				}
 
-				if($service['deleted']) {
+				if($service['deleted'])
+				{
 					$status = 'Usunięte';
 					$priceTest = null;
 				}
 
-				if ($service['worker_id'] == 0) {
+				if ($service['worker_id'] == 0)
+				{
 					$workerName = '-';
-				} elseif ($service['worker_id'] == $workerId) {
+				}
+				elseif ($service['worker_id'] == $workerId)
+				{
 					$workerName = 'Ty';
-				} else {
+				}
+				else
+				{
 					// $workerName = workersList($service['worker_id']);
 					$workerName = $service['workerName'];
 
@@ -104,44 +111,52 @@ $allowDelete = true;
 
 						if ($actionButtons) {
 
-							if ($service['status'] == 'finished') {
+							if ($service['status'] == 'finished')
+							{
 								print '<a class="ico fa fa-check" title="Cofnij oznaczenie ukończenia" href="/sk/service/'. $service['id'] .'/incomplete"></a>';
-
-							} elseif ($service['status'] == 'canceled') {
+							}
+							elseif ($service['status'] == 'canceled')
+							{
 								print '<a class="ico fa fa-frown-o" title="Cofnij rezygnację z naprawy" href="/sk/service/'. $service['id'] .'/restore"></a>';
-
-							} elseif ($service['deleted']) {
+							}
+							elseif ($service['deleted'])
+							{
 								print '<a class="ico fa fa-trash" title="Przywróć" href="/sk/service/'. $service['id'] .'/recover"></a>';
-
-							} else {
+							}
+							else
+							{
 								print '<a class="ico fa fa-check" title="Oznacz jako ukończone" href="/sk/service/'. $service['id'] . '/complete"></a>';
 
-								if ($service['part_id']) {
+								if ($service['part_id'])
+								{
 									print '<a class="ico fa fa-plug" title="Odłącz część" href="/sk/service/'. $service['id'] .'/unplug-part/"></a>';
-								} else {
-									print '<a class="ico fa fa-wrench" title="Przypisz część" href="#" onclick="assignPart('. $service['id'] .');"></a>';
-
 								}
-								
+								else
+								{
+									print '<a class="ico fa fa-wrench" title="Przypisz część" href="#" onclick="assignPart('. $service['id'] .');"></a>';
+								}
 
 								print '<a class="ico fa fa-frown-o" title="Rezygnacja z tej naprawy" href="/sk/service/'. $service['id'] .'/cancel"></a>';
 
-
-								if ($allowEdit) {
+								if ($allowEdit)
+								{
 									print '<a class="ico fa fa-edit solution-edit" title="Edytuj"></a>';
-
 								}
 
-								if ($allowDelete) {
+								if ($allowDelete)
+								{
 									print '<a class="ico fa fa-trash" title="Usuń" href="/sk/service/'. $service['id'] .'/delete"></a>';
 								}
 
-								if ($allowChangeWorker) {
+								if ($allowChangeWorker)
+								{
 									print '<i class="ico fa fa-user-plus change-worker-button" title="Zmień pracownika"></i>';
 								}
 
 							}
-						} else {
+						}
+						else
+						{
 							print '-';
 						}
 					?>
@@ -156,7 +171,7 @@ $allowDelete = true;
 			<!-- </tr> -->
 			<tr class="buttons" style="line-height: 28px;">
 				<td class="kek" style="text-align: right; padding-right: 10px;">
-					<button class="button add-solution" style="position: absolute; left:27px; bottom: 13px; top:auto; width:80px;" type="button">Dodaj</button>
+					<button class="button add-solution-btn" style="position: absolute; left:27px; bottom: 13px; top:auto; width:80px;" type="button">Dodaj</button>
 					<button class="button solution-save-btn hidden" style="position: absolute; left:118px; bottom: 13px; top:auto; width:80px;" type="button">Zapisz</button>
 					<span>RAZEM</span>
 				</td>

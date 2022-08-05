@@ -8,8 +8,8 @@ if ($action == 'create-order')
 	$part = new Part($db);
 	$partCategories = $part->getAllCategories();
 
-	$view->joinCSS('part');
-	$view->joinJS('part');
+	$view->addCSS('part');
+	$view->addJS('part');
 	$view->addData(['partCategories' => $partCategories]);
 	$view->addView('create-order-form');
 	$view->addView('category-create');
